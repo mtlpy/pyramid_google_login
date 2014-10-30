@@ -1,0 +1,7 @@
+Changelog
+=========
+
+Development
+-----------
+
+* Initial setup
