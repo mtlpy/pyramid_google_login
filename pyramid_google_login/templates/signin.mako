@@ -1,18 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>Signin</title>
-  </head>
-  <body>
-    <p style="text-align: center; font-size: 2em; font-family: arial;">
-        <a href="${signin_redirect_url}">Signin on Google!</a>
-    </p>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign in</title>
 
-    % if message:
-    <p style="text-align: center; font-family: arial;">
+  <link rel="stylesheet"
+        href="${request.static_url('pyramid_google_login:static/pure-min.css')}">
+  <link rel="stylesheet"
+        href="${request.static_url('pyramid_google_login:static/login.css')}">
+</head>
+<body>
+
+  <div class="splash-container">
+    <div class="splash">
+
+% if signin_banner:
+      <p class="splash-head">
+        ${signin_banner}
+      </p>
+% endif
+
+      <p>
+        <a href="${signin_redirect_url}" class="pure-button pure-button-primary">
+          Sign in
+        </a>
+      </p>
+
+      <p class="splash-message">
+% if message:
         ${message}
-    </p>
-    % endif
-  </body>
+% else:
+        Please sign in with your Google account
+% endif
+      </p>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
 </html>

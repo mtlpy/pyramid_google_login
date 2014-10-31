@@ -19,7 +19,13 @@ log = logging.getLogger(__name__)
              permission=NO_PERMISSION_REQUIRED,
              renderer='pyramid_google_login:templates/signin.mako')
 def signin(context, request):
-    message = request.params.get('message')
+    settings = request.registry.settings
+    signin_banner = settings.get(SETTINGS_PREFIX + 'signin_banner')
+
+    signin_advice = settings.get(SETTINGS_PREFIX + 'signin_advice',
+                                 'Please sign in with your Google account')
+    message = request.params.get('message', signin_advice)
+
     if 'url' in request.params:
         url = request.route_url("auth_signin_redirect",
                                 _query={'url': request.params['url']})
@@ -27,7 +33,9 @@ def signin(context, request):
         url = request.route_url("auth_signin_redirect")
 
     return {'signin_redirect_url': url,
-            'message': message}
+            'message': message,
+            'signin_banner': signin_banner
+            }
 
 
 @view_config(route_name='auth_signin_redirect',

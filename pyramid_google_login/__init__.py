@@ -21,8 +21,6 @@ def includeme(config):
     config.add_route('auth_callback', '/auth/oauth2callback')
     config.add_route('auth_logout', '/auth/logout')
 
+    config.add_static_view('static', 'pyramid_google_login:static')
+
     config.scan('pyramid_google_login')
-
-
-
-
