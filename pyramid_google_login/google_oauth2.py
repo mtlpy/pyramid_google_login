@@ -50,7 +50,7 @@ def exchange_token_from_code(request):
         client_id = settings[SETTINGS_PREFIX + 'client_id']
         client_secret = settings[SETTINGS_PREFIX + 'client_secret']
     except KeyError as err:
-        raise AuthFailed("Missing settings (%s)" % err)
+        raise AuthFailed("Missing settings")
 
     params = {
         "code": code,
@@ -80,3 +80,16 @@ def get_userinfo_from_token(access_token):
                         params={'access_token': access_token})
     resp.raise_for_status()
     return resp.json()
+
+
+def get_principal_from_userinfo(request, userinfo):
+    user_id_field = request.registry.settings.get(
+        SETTINGS_PREFIX + 'user_id_field',
+        'email')
+
+    try:
+        principal = userinfo[user_id_field]
+    except:
+        raise AuthFailed("Missing principal field from Google userinfo")
+
+    return principal

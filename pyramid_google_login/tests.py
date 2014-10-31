@@ -59,4 +59,3 @@ class Test(unittest.TestCase):
 
         expected = 'http://localhost/auth/signin?message=Logged+out%21'
         self.assertEqual(resp.location, expected)
-

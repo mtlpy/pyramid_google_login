@@ -5,9 +5,12 @@ from pyramid.security import (remember, forget, NO_PERMISSION_REQUIRED)
 from pyramid.httpexceptions import HTTPFound
 
 from pyramid_google_login import SETTINGS_PREFIX
+from pyramid_google_login import redirect_to_signin
+from pyramid_google_login import AuthFailed
 from pyramid_google_login.google_oauth2 import (build_authorize_url,
                                                 exchange_token_from_code,
                                                 get_userinfo_from_token,
+                                                get_principal_from_userinfo,
                                                 encode_state,
                                                 decode_state,
                                                 )
@@ -27,10 +30,10 @@ def signin(context, request):
     message = request.params.get('message', signin_advice)
 
     if 'url' in request.params:
-        url = request.route_url("auth_signin_redirect",
-                                _query={'url': request.params['url']})
+        query = {'url': request.params['url']}
+        url = request.route_url('auth_signin_redirect', _query=query)
     else:
-        url = request.route_url("auth_signin_redirect")
+        url = request.route_url('auth_signin_redirect')
 
     return {'signin_redirect_url': url,
             'message': message,
@@ -47,7 +50,6 @@ def signin_redirect(context, request):
 
     state = encode_state(state_params)
     redirect_uri = build_authorize_url(request, state)
-
     return HTTPFound(location=redirect_uri)
 
 
@@ -55,19 +57,22 @@ def signin_redirect(context, request):
              permission=NO_PERMISSION_REQUIRED)
 def callback(context, request):
     settings = request.registry.settings
-    user_id_field = settings.get(SETTINGS_PREFIX + 'user_id_field', 'email')
     landing_url = settings.get(SETTINGS_PREFIX + 'landing_url', '/')
     max_age = int(settings.get(SETTINGS_PREFIX + 'max_age', 24 * 3600))
 
     try:
         access_token = exchange_token_from_code(request)
         userinfo = get_userinfo_from_token(access_token)
-        principal = userinfo[user_id_field]
+        principal = get_principal_from_userinfo(request, userinfo)
+
+    except AuthFailed as err:
+        log.warning("Google Login failed (%s)", err)
+        redirect_to_signin(request, "Google Login failed (%s)" % err)
+
     except Exception as err:
-        error_msg = "Google Login failed (%s)" % err
-        log.warning(error_msg)
-        url = request.route_url('auth_signin', _query={'message': error_msg})
-        return HTTPFound(location=url)
+        log.warning("Google Login failed (%s)", err)
+        # Protect against leaking critical information like client_secret
+        redirect_to_signin(request, "Google Login failed (unkown)")
 
     # Find the redirect url (fail-safe, the authentication is more important)
     try:
@@ -82,8 +87,5 @@ def callback(context, request):
 
 @view_config(route_name='auth_logout')
 def logout(context, request):
-    url = request.route_url('auth_signin', _query={'message': "Logged out!"})
-
     headers = forget(request)
-
-    return HTTPFound(location=url, headers=headers)
+    redirect_to_signin(request, "You are logged out!", headers=headers)

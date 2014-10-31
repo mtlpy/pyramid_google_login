@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from pyramid.httpexceptions import HTTPFound
+
 log = logging.getLogger(__name__)
 
 
@@ -24,3 +26,14 @@ def includeme(config):
     config.add_static_view('static', 'pyramid_google_login:static')
 
     config.scan('pyramid_google_login')
+
+
+def redirect_to_signin(request, message=None, url=None, headers=None):
+    """ Redirect to the sign in page with message and next url """
+    query = {}
+    if message is not None:
+        query['message'] = message
+    if url is not None:
+        query['url'] = url
+    url = request.route_url('auth_signin', _query=query)
+    raise HTTPFound(location=url, headers=headers)

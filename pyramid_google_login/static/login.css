@@ -44,7 +44,6 @@ a.pure-button-primary {
     position: absolute;
     top: 100px; left: 0; bottom: 0; right: 0;
     text-align: center;
-    text-transform: uppercase;
 }
 
 /* This is the subheading that appears on the blue section */
@@ -53,12 +52,14 @@ a.pure-button-primary {
     color: white;
     letter-spacing: 0.05em;
     opacity: 0.8;
+    text-transform: uppercase;
 }
 
 .splash-message {
     color: white;
     letter-spacing: 0.05em;
     margin: 3em;
+
 }
 
 
