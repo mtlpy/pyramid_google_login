@@ -49,7 +49,12 @@ def signin_redirect(context, request):
         state_params['url'] = request.params['url']
 
     state = encode_state(state_params)
-    redirect_uri = build_authorize_url(request, state)
+    try:
+        redirect_uri = build_authorize_url(request, state)
+    except AuthFailed as err:
+        log.warning("Google Login failed (%s)", err)
+        redirect_to_signin(request, "Google Login failed (%s)" % err)
+
     return HTTPFound(location=redirect_uri)
 
 

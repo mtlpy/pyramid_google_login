@@ -22,7 +22,11 @@ def decode_state(state):
 
 
 def build_authorize_url(request, state):
-    client_id = request.registry.settings[SETTINGS_PREFIX + 'client_id']
+    settings = request.registry.settings
+    try:
+        client_id = settings[SETTINGS_PREFIX + 'client_id']
+    except:
+        raise AuthFailed("Missing settings")
 
     params = {
         "response_type": "code",
