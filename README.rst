@@ -1,5 +1,5 @@
 ====================
-Pyramid_google_login
+Pyramid Google Login
 ====================
 
 Google Login extension for Pyramid. Implement the OAuth2 Server-side flow.

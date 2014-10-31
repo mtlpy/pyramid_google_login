@@ -25,7 +25,7 @@ def includeme(config):
 
     config.add_static_view('static', 'pyramid_google_login:static')
 
-    config.scan('pyramid_google_login')
+    config.scan()
 
 
 def redirect_to_signin(request, message=None, url=None, headers=None):
