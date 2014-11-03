@@ -11,3 +11,4 @@ Development
 * Change error reporting during OAuth2 second phase to avoid leaking secrets
 * Add protection against unkown error in oauth2 functions
 * Add tests
+* Add option to limit login to one Google Hosted Domain

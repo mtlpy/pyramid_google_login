@@ -31,13 +31,17 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
 
         request = mock.Mock()
         request.route_url.return_value = 'TESTROUTEURL'
-        request.registry.settings = {'security.google_login.client_id': '4'}
+        request.registry.settings = {
+            'security.google_login.client_id': 'CLIENTID',
+            'security.google_login.hosted_domain': 'example.net',
+        }
         state = 'TESTSTATE'
 
         url = build_authorize_url(request, state)
         expected = ('https://accounts.google.com/o/oauth2/auth?'
-                    'scope=email&state=TESTSTATE&redirect_uri=TESTROUTEURL&'
-                    'response_type=code&client_id=4')
+                    'state=TESTSTATE&redirect_uri=TESTROUTEURL&'
+                    'response_type=code&client_id=CLIENTID&'
+                    'scope=email&hd=example.net')
 
         self.assertEqual(url, expected)
 
@@ -160,6 +164,51 @@ class TestGetUserinfoFromToken(unittest.TestCase):
 
         self.call_and_assert_raises_with_message(
             'Failed to get userinfo from Google')
+
+
+class TestCheckHostedDomainUser(unittest.TestCase):
+
+    def setUp(self):
+        self.request = mock.Mock()
+        self.request.params = {'code': 'CODE1234'}
+        self.settings = {
+            'security.google_login.hosted_domain': 'example.net',
+        }
+        self.request.registry.settings = self.settings
+
+    def test_nominal(self):
+        from pyramid_google_login.google_oauth2 import (
+            check_hosted_domain_user)
+
+        userinfo = {'hd': 'example.net'}
+        check_hosted_domain_user(self.request, userinfo)
+
+    def test_wrong_domain(self):
+        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.google_oauth2 import (
+            check_hosted_domain_user)
+
+        userinfo = {'hd': 'reallynotexample.net'}
+
+        with self.assertRaises(AuthFailed) as test_exc:
+            check_hosted_domain_user(self.request, userinfo)
+
+        self.assertEqual(test_exc.exception.message,
+                         'You logged in with an unkown domain '
+                         '(reallynotexample.net rather than example.net)')
+
+    def test_missing_userinfo_field(self):
+        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.google_oauth2 import (
+            check_hosted_domain_user)
+
+        userinfo = {}
+
+        with self.assertRaises(AuthFailed) as test_exc:
+            check_hosted_domain_user(self.request, userinfo)
+
+        self.assertEqual(test_exc.exception.message,
+                         'Missing hd field from Google userinfo')
 
 
 class TestGetPrincipalFromUserinfo(unittest.TestCase):

@@ -28,12 +28,20 @@
       </p>
 
       <p class="splash-message">
-% if message:
-        ${message}
+% if signin_advice:
+        ${signin_advice}
+% elif hosted_domain is not None:
+        Please sign in with your ${hosted_domain} account
 % else:
         Please sign in with your Google account
 % endif
       </p>
+
+% if message:
+      <p class="splash-error">
+        ${message}
+      </p>
+% endif
 
     </div>
   </div>

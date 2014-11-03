@@ -26,6 +26,7 @@ def decode_state(state):
 
 def build_authorize_url(request, state):
     settings = request.registry.settings
+    hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
     try:
         client_id = settings[SETTINGS_PREFIX + 'client_id']
     except:
@@ -38,6 +39,10 @@ def build_authorize_url(request, state):
         "scope": "email",
         "state": state,
     }
+
+    if hosted_domain is not None:
+        params['hd'] = hosted_domain
+
     authorize_url = "%s?%s" % (GOOGLE_AUTHORIZE, urllib.urlencode(params))
 
     return authorize_url
@@ -96,6 +101,24 @@ def get_userinfo_from_token(access_token):
         log.warning("Unkown error calling userinfo endpoint",
                     exc_info=True)
         raise AuthFailed("Failed to get userinfo from Google")
+
+
+def check_hosted_domain_user(request, userinfo):
+    settings = request.registry.settings
+    hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
+
+    if hosted_domain is None:
+        return
+
+    try:
+        user_hosted_domain = userinfo['hd']
+    except KeyError:
+        raise AuthFailed("Missing hd field from Google userinfo")
+
+    if hosted_domain != user_hosted_domain:
+        raise AuthFailed("You logged in with an unkown domain "
+                         "(%s rather than %s)" % (user_hosted_domain,
+                                                  hosted_domain))
 
 
 def get_principal_from_userinfo(request, userinfo):

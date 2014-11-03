@@ -48,6 +48,7 @@ Settings::
    security.google_login.client_id = xxxxxxx.apps.googleusercontent.com
    security.google_login.client_secret = xxxxxxxxxxxxxxxxxxxxxxxxx
    # security.google_login.user_id_field = email
+   # security.google_login.hosted_domain = example.net
    # security.google_login.landing_url = /
    # security.google_login.max_age = 86400
    # security.google_login.signin_banner = Welcome on Project Euler

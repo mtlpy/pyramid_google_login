@@ -10,6 +10,7 @@ from pyramid_google_login import AuthFailed
 from pyramid_google_login.google_oauth2 import (build_authorize_url,
                                                 exchange_token_from_code,
                                                 get_userinfo_from_token,
+                                                check_hosted_domain_user,
                                                 get_principal_from_userinfo,
                                                 encode_state,
                                                 decode_state,
@@ -24,10 +25,9 @@ log = logging.getLogger(__name__)
 def signin(request):
     settings = request.registry.settings
     signin_banner = settings.get(SETTINGS_PREFIX + 'signin_banner')
-
-    signin_advice = settings.get(SETTINGS_PREFIX + 'signin_advice',
-                                 'Please sign in with your Google account')
-    message = request.params.get('message', signin_advice)
+    hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
+    signin_advice = settings.get(SETTINGS_PREFIX + 'signin_advice')
+    message = request.params.get('message')
 
     if 'url' in request.params:
         query = {'url': request.params['url']}
@@ -37,7 +37,9 @@ def signin(request):
 
     return {'signin_redirect_url': url,
             'message': message,
-            'signin_banner': signin_banner
+            'signin_banner': signin_banner,
+            'signin_advice': signin_advice,
+            'hosted_domain': hosted_domain,
             }
 
 
@@ -68,6 +70,7 @@ def callback(request):
     try:
         access_token = exchange_token_from_code(request)
         userinfo = get_userinfo_from_token(access_token)
+        check_hosted_domain_user(request, userinfo)
         principal = get_principal_from_userinfo(request, userinfo)
 
     except AuthFailed as err:

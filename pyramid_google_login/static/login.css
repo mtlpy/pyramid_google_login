@@ -62,6 +62,10 @@ a.pure-button-primary {
 
 }
 
+.splash-error {
+    color: #000923;
+    margin: 3em;
+}
 
 @media (min-width: 48em) {
 
