@@ -1,3 +1,4 @@
+import logging
 import urllib
 import urlparse
 
@@ -6,6 +7,8 @@ from requests.exceptions import RequestException
 
 from pyramid_google_login import SETTINGS_PREFIX
 from pyramid_google_login import AuthFailed
+
+log = logging.getLogger(__name__)
 
 
 GOOGLE_AUTHORIZE = "https://accounts.google.com/o/oauth2/auth"
@@ -70,6 +73,10 @@ def exchange_token_from_code(request):
         oauth2_response = resp.json()
     except RequestException as err:
         raise AuthFailed("Failed to get token from Google (%s)" % err)
+    except Exception as err:
+        log.warning("Unkown error while calling token endpoint",
+                    exc_info=True)
+        raise AuthFailed("Failed to get token from Google (unkown error)")
 
     try:
         access_token = oauth2_response['access_token']
@@ -80,10 +87,15 @@ def exchange_token_from_code(request):
 
 
 def get_userinfo_from_token(access_token):
-    resp = requests.get(GOOGLE_USERINFO,
-                        params={'access_token': access_token})
-    resp.raise_for_status()
-    return resp.json()
+    try:
+        resp = requests.get(GOOGLE_USERINFO,
+                            params={'access_token': access_token})
+        resp.raise_for_status()
+        return resp.json()
+    except Exception:
+        log.warning("Unkown error calling userinfo endpoint",
+                    exc_info=True)
+        raise AuthFailed("Failed to get userinfo from Google")
 
 
 def get_principal_from_userinfo(request, userinfo):

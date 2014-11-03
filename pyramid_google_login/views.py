@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 @view_config(route_name='auth_signin',
              permission=NO_PERMISSION_REQUIRED,
              renderer='pyramid_google_login:templates/signin.mako')
-def signin(context, request):
+def signin(request):
     settings = request.registry.settings
     signin_banner = settings.get(SETTINGS_PREFIX + 'signin_banner')
 
@@ -43,7 +43,7 @@ def signin(context, request):
 
 @view_config(route_name='auth_signin_redirect',
              permission=NO_PERMISSION_REQUIRED,)
-def signin_redirect(context, request):
+def signin_redirect(request):
     state_params = {}
     if 'url' in request.params:
         state_params['url'] = request.params['url']
@@ -60,7 +60,7 @@ def signin_redirect(context, request):
 
 @view_config(route_name='auth_callback',
              permission=NO_PERMISSION_REQUIRED)
-def callback(context, request):
+def callback(request):
     settings = request.registry.settings
     landing_url = settings.get(SETTINGS_PREFIX + 'landing_url', '/')
     max_age = int(settings.get(SETTINGS_PREFIX + 'max_age', 24 * 3600))
@@ -91,6 +91,6 @@ def callback(context, request):
 
 
 @view_config(route_name='auth_logout')
-def logout(context, request):
+def logout(request):
     headers = forget(request)
     redirect_to_signin(request, "You are logged out!", headers=headers)
