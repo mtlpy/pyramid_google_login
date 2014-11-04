@@ -35,11 +35,10 @@ class TestHelpers(unittest.TestCase):
 
         request = mock.Mock()
 
-        with self.assertRaises(HTTPFound) as test_exc:
-            redirect_to_signin(request)
+        httpfound = redirect_to_signin(request)
+        self.assertIsInstance(httpfound, HTTPFound)
 
         request.route_url.assert_called_once_with('auth_signin', _query={})
-        httpfound = test_exc.exception
         self.assertEqual(httpfound.location, request.route_url.return_value)
 
     def test_redirect_to_signin_url(self):
@@ -48,12 +47,11 @@ class TestHelpers(unittest.TestCase):
 
         request = mock.Mock()
 
-        with self.assertRaises(HTTPFound) as test_exc:
-            redirect_to_signin(request, url='/test')
+        httpfound = redirect_to_signin(request, url='/test')
+        self.assertIsInstance(httpfound, HTTPFound)
 
         request.route_url.assert_called_once_with('auth_signin',
                                                   _query={'url': '/test'})
-        httpfound = test_exc.exception
         self.assertEqual(httpfound.location, request.route_url.return_value)
 
     def test_redirect_to_signin_headers(self):
@@ -64,9 +62,8 @@ class TestHelpers(unittest.TestCase):
 
         test_header = ('X-Test', 'Yeap')
 
-        with self.assertRaises(HTTPFound) as test_exc:
-            redirect_to_signin(request, headers=[test_header])
+        httpfound = redirect_to_signin(request, headers=[test_header])
+        self.assertIsInstance(httpfound, HTTPFound)
 
-        httpfound = test_exc.exception
         self.assertEqual(httpfound.location, request.route_url.return_value)
         self.assertIn(test_header, httpfound.headerlist)

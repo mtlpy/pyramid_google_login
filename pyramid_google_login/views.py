@@ -55,7 +55,7 @@ def signin_redirect(request):
         redirect_uri = build_authorize_url(request, state)
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
-        redirect_to_signin(request, "Google Login failed (%s)" % err)
+        return redirect_to_signin(request, "Google Login failed (%s)" % err)
 
     return HTTPFound(location=redirect_uri)
 
@@ -75,12 +75,12 @@ def callback(request):
 
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
-        redirect_to_signin(request, "Google Login failed (%s)" % err)
+        return redirect_to_signin(request, "Google Login failed (%s)" % err)
 
     except Exception as err:
         log.warning("Google Login failed (%s)", err)
         # Protect against leaking critical information like client_secret
-        redirect_to_signin(request, "Google Login failed (unkown)")
+        return redirect_to_signin(request, "Google Login failed (unkown)")
 
     # Find the redirect url (fail-safe, the authentication is more important)
     try:
@@ -96,4 +96,4 @@ def callback(request):
 @view_config(route_name='auth_logout')
 def logout(request):
     headers = forget(request)
-    redirect_to_signin(request, "You are logged out!", headers=headers)
+    return redirect_to_signin(request, "You are logged out!", headers=headers)

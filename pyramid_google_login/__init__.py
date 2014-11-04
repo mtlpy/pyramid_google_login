@@ -38,4 +38,4 @@ def redirect_to_signin(request, message=None, url=None, headers=None):
     if url is not None:
         query['url'] = url
     url = request.route_url('auth_signin', _query=query)
-    raise HTTPFound(location=url, headers=headers)
+    return HTTPFound(location=url, headers=headers)

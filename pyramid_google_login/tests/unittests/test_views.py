@@ -67,14 +67,15 @@ class TestCallback(unittest.TestCase):
 
         m_exch_t.side_effect = AuthFailed('TESTEXC')
 
-        with self.assertRaises(HTTPFound) as test_exc:
-            callback(self.request)
+        test_exc = callback(self.request)
+
+        self.assertIsInstance(test_exc, HTTPFound)
 
         self.request.route_url.assert_called_once_with(
             'auth_signin',
             _query={'message': 'Google Login failed (TESTEXC)'})
 
-        self.assertEqual(test_exc.exception.location,
+        self.assertEqual(test_exc.location,
                          '/test/url')
 
     def test_unkown_error(self, m_rem, m_dec_s, m_get_p, m_get_u,
@@ -85,8 +86,9 @@ class TestCallback(unittest.TestCase):
 
         m_exch_t.side_effect = Exception('TESTEXC')
 
-        with self.assertRaises(HTTPFound) as test_exc:
-            callback(self.request)
+        test_exc = callback(self.request)
+
+        self.assertIsInstance(test_exc, HTTPFound)
 
         self.request.route_url.assert_called_once_with(
             'auth_signin',
