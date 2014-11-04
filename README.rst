@@ -86,8 +86,14 @@ Usage
 
 When a user must be authenticated by Google, he must be sent to the
 ``auth_signin`` route url. The helper method
-``pyramid_google_login.redirect_to_signin`` lets you specify the welcome
-message and the landing url.
+``pyramid_google_login.redirect_to_signin`` redirect a user to the sign in
+page. This helper is handy to specify the next url and an optional message.
+
+.. code-block:: python
+
+   @forbidden_view_config()
+   def unauthenticated(context, request):
+       return redirect_to_signin(request, url=request.path_qs)
 
 Once authenticated, the user will be redirected to an url specified by:
 
