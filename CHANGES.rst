@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+0.1.0 (2014-11-04)
+------------------
 
 * Initial setup
 * Naive implementation of the server-side Google authentication flow
