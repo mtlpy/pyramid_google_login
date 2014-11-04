@@ -12,7 +12,13 @@ remember the user identity.
 
 * PyPI: https://pypi.python.org/pypi/pyramid_google_login
 * Bitbucket: https://bitbucket.org/Ludia/pyramid_google_login
+* Tests: |droneio|
 * Bugs: https://bitbucket.org/Ludia/pyramid_google_login/issues
+
+.. |droneio| image::
+   https://drone.io/bitbucket.org/Ludia/pyramid_google_login/status.png
+   :target: https://drone.io/bitbucket.org/Ludia/pyramid_google_login
+   :alt: Tests on drone.io
 
 
 Installation
