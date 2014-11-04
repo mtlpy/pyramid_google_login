@@ -21,8 +21,9 @@ class TestIncludeme(unittest.TestCase):
         ]
         config.add_route.assert_has_calls(expected_calls, any_order=True)
         config.add_static_view.assert_called_once_with(
-            'static',
-            'pyramid_google_login:static')
+            'static/pyramid_google_login',
+            'pyramid_google_login:static',
+            cache_max_age=300)
         config.scan.assert_called_once_with()
 
 
