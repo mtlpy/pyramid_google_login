@@ -7,7 +7,7 @@ Google Login extension for Pyramid. Implement the OAuth2 Server-side flow.
 This extension doesn't configure any authentication policy. You are responsible
 of setting the proper security configuration in your Pyramid application. When
 authenticated by Google, this extension calls the method
-:py:meth:`pyramid.security.remember` and assume the authentication policy will
+``pyramid.security.remember`` and assume the authentication policy will
 remember the user identity.
 
 * PyPI: https://pypi.python.org/pypi/pyramid_google_login
@@ -80,7 +80,7 @@ Usage
 
 When a user must be authenticated by Google, he must be sent to the
 ``auth_signin`` route url. The helper method
-:py:func:`pyramid_google_login.redirect_to_signin` lets you specify the welcome
+``pyramid_google_login.redirect_to_signin`` lets you specify the welcome
 message and the landing url.
 
 Once authenticated, the user will be redirected to an url specified by:
