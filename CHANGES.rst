@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+0.2.0 (2014-11-04)
+------------------
 
 * Change redirect_to_signin to return HTTPFound (rather than raising it)
 
