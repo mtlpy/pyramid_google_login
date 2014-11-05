@@ -67,3 +67,66 @@ class TestHelpers(unittest.TestCase):
 
         self.assertEqual(httpfound.location, request.route_url.return_value)
         self.assertIn(test_header, httpfound.headerlist)
+
+    def test_find_landing_path(self):
+        from pyramid_google_login import find_landing_path
+
+        request = mock.Mock()
+        request.registry.settings = {
+
+        }
+
+        path = find_landing_path(request)
+
+        self.assertEqual(path, '/')
+
+    def test_find_landing_path_landing_url(self):
+        from pyramid_google_login import find_landing_path
+
+        request = mock.Mock()
+        request.registry.settings = {
+            'security.google_login.landing_url': '/foobar',
+        }
+
+        path = find_landing_path(request)
+
+        self.assertEqual(path, '/foobar')
+
+    def test_find_landing_path_landing_route(self):
+        from pyramid_google_login import find_landing_path
+
+        request = mock.Mock()
+        request.registry.settings = {
+            'security.google_login.landing_route': 'myroute',
+        }
+
+        path = find_landing_path(request)
+
+        self.assertEqual(path, request.route_path.return_value)
+
+    def test_find_landing_path_landing_route_static(self):
+        from pyramid_google_login import find_landing_path
+
+        request = mock.Mock()
+        request.registry.settings = {
+            'security.google_login.landing_route': 'myroute',
+        }
+        request.route_path.side_effect = KeyError()
+
+        path = find_landing_path(request)
+
+        self.assertEqual(path, request.static_path.return_value)
+
+    def test_find_landing_path_fallback(self):
+        from pyramid_google_login import find_landing_path
+
+        request = mock.Mock()
+        request.registry.settings = {
+            'security.google_login.landing_route': 'myroute',
+        }
+        request.route_path.side_effect = KeyError()
+        request.static_path.side_effect = KeyError()
+
+        path = find_landing_path(request)
+
+        self.assertEqual(path, '/')

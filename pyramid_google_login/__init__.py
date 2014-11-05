@@ -39,3 +39,24 @@ def redirect_to_signin(request, message=None, url=None, headers=None):
         query['url'] = url
     url = request.route_url('auth_signin', _query=query)
     return HTTPFound(location=url, headers=headers)
+
+
+def find_landing_path(request):
+    settings = request.registry.settings
+
+    landing_url = settings.get(SETTINGS_PREFIX + 'landing_url')
+    if landing_url is not None:
+        return landing_url
+
+    landing_route = settings.get(SETTINGS_PREFIX + 'landing_route')
+    if landing_route is not None:
+        try:
+            return request.route_path(landing_route)
+        except KeyError:
+            pass
+        try:
+            return request.static_path(landing_route)
+        except KeyError:
+            pass
+
+    return '/'

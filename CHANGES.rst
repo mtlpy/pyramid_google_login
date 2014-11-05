@@ -4,6 +4,9 @@ Changelog
 Development
 -----------
 
+* Resolve landing path from settings landing_url and landing_route
+* Redirect authenticated user to landing page from sign in page
+
 0.2.0 (2014-11-04)
 ------------------
 

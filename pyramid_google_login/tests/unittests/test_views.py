@@ -96,3 +96,57 @@ class TestCallback(unittest.TestCase):
 
         self.assertEqual(test_exc.exception.location,
                          '/test/url')
+
+
+@mock.patch('pyramid_google_login.views.find_landing_path')
+class Testsignin(unittest.TestCase):
+
+    def setUp(self):
+        self.request = mock.Mock()
+        self.request.params = {
+        }
+        self.settings = {
+            'security.google_login.signin_banner': 'CLIENTID',
+            'security.google_login.client_secret': 'CLIENTSECRET',
+        }
+        self.request.registry.settings = self.settings
+
+        self.request.authenticated_userid = None
+        self.request.route_url.return_value = '/test/url'
+
+    def test_nominal(self, m_find_landing_path):
+        from pyramid_google_login.views import signin
+        # from pyramid.httpexceptions import HTTPFound
+
+        resp = signin(self.request)
+
+        expected = {'hosted_domain': None,
+                    'message': None,
+                    'signin_advice': None,
+                    'signin_banner': 'CLIENTID',
+                    'signin_redirect_url': '/test/url'}
+
+        self.assertEqual(resp, expected)
+
+    def test_authenticated(self, m_find_landing_path):
+        from pyramid_google_login.views import signin
+        from pyramid.httpexceptions import HTTPFound
+
+        self.request.authenticated_userid = '123'
+
+        resp = signin(self.request)
+
+        self.assertIsInstance(resp, HTTPFound)
+        self.assertEqual(resp.location, m_find_landing_path.return_value)
+
+    def test_authenticated_with_url(self, m_find_landing_path):
+        from pyramid_google_login.views import signin
+        from pyramid.httpexceptions import HTTPFound
+
+        self.request.params['url'] = '/go/there'
+        self.request.authenticated_userid = '123'
+
+        resp = signin(self.request)
+
+        self.assertIsInstance(resp, HTTPFound)
+        self.assertEqual(resp.location, '/go/there')
