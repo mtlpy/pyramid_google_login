@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+0.5.0 (2014-11-06)
+------------------
 
 * Fix issue with config.scan() (pyramid/venusian importing tests)
 
