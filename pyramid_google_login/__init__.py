@@ -17,17 +17,7 @@ def includeme(config):
     log.info("Add pyramid_google_login")
 
     config.include('pyramid_mako')
-
-    config.add_route('auth_signin', '/auth/signin')
-    config.add_route('auth_signin_redirect', '/auth/signin_redirect')
-    config.add_route('auth_callback', '/auth/oauth2callback')
-    config.add_route('auth_logout', '/auth/logout')
-
-    config.add_static_view('static/pyramid_google_login',
-                           'pyramid_google_login:static',
-                           cache_max_age=300)
-
-    config.scan()
+    config.include('.views')
 
 
 def redirect_to_signin(request, message=None, url=None, headers=None):

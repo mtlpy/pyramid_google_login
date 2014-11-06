@@ -20,6 +20,19 @@ from pyramid_google_login.google_oauth2 import (build_authorize_url,
 log = logging.getLogger(__name__)
 
 
+def includeme(config):
+    config.add_route('auth_signin', '/auth/signin')
+    config.add_route('auth_signin_redirect', '/auth/signin_redirect')
+    config.add_route('auth_callback', '/auth/oauth2callback')
+    config.add_route('auth_logout', '/auth/logout')
+
+    config.add_static_view('static/pyramid_google_login',
+                           'pyramid_google_login:static',
+                           cache_max_age=300)
+
+    config.scan(__name__)
+
+
 @view_config(route_name='auth_signin',
              permission=NO_PERMISSION_REQUIRED,
              renderer='pyramid_google_login:templates/signin.mako')

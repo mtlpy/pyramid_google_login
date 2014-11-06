@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* Fix issue with config.scan() (pyramid/venusian importing tests)
+
 0.4.0 (2014-11-06)
 ------------------
 

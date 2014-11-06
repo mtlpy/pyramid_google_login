@@ -3,6 +3,29 @@ import unittest
 import mock
 
 
+class TestIncludeme(unittest.TestCase):
+
+    def test_includeme(self):
+        from pyramid_google_login.views import includeme
+
+        config = mock.Mock()
+
+        includeme(config)
+
+        expected_calls = [
+            mock.call('auth_signin', '/auth/signin'),
+            mock.call('auth_signin_redirect', '/auth/signin_redirect'),
+            mock.call('auth_callback', '/auth/oauth2callback'),
+            mock.call('auth_logout', '/auth/logout'),
+        ]
+        config.add_route.assert_has_calls(expected_calls, any_order=True)
+        config.add_static_view.assert_called_once_with(
+            'static/pyramid_google_login',
+            'pyramid_google_login:static',
+            cache_max_age=300)
+        config.scan.assert_called_once_with('pyramid_google_login.views')
+
+
 @mock.patch('pyramid_google_login.views.exchange_token_from_code')
 @mock.patch('pyramid_google_login.views.get_userinfo_from_token')
 @mock.patch('pyramid_google_login.views.get_principal_from_userinfo')
