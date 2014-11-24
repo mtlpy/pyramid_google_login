@@ -49,10 +49,11 @@ Alternately you can use the ``pyramid.includes`` configuration value in your
    [app:myapp]
    pyramid.includes = pyramid_google_login
 
-Settings::
+Default settings::
 
    security.google_login.client_id = xxxxxxx.apps.googleusercontent.com
    security.google_login.client_secret = xxxxxxxxxxxxxxxxxxxxxxxxx
+   # security.google_login.scopes = email
    # security.google_login.user_id_field = email
    # security.google_login.hosted_domain = example.net
    # security.google_login.landing_url = /
@@ -83,8 +84,8 @@ Notes:
   id is often the best idea.
 
 
-Usage
-=====
+General Usage
+=============
 
 When a user must be authenticated by Google, he must be sent to the
 ``auth_signin`` route url. The helper method
@@ -107,6 +108,53 @@ When a user must be logged out, he must be directed on the ``auth_logout``
 route url. Once logged out, he will be redirected back to the sign in page.
 
 
+Offline Usage
+=============
+
+If you want to call the Google APIs on behalf of the user, you must store the
+OAuth2 information provided in the UserLoggedIn event. The ``access_token`` is
+usable for a ``expires_in`` period. Then the ``refresh_token`` must be used to
+refresh the ``access_token``. This ``refresh_token`` is valide until the user
+revoke the application permissions.
+
+By default, the only scope requested is ``email`` to identify the user. To call
+other Google APIs, you must add the related scopes as this:
+
+.. code-block:: ini
+
+   [app:myapp]
+
+   security.google_login.scopes =
+       email
+       https://www.googleapis.com/auth/admin.directory.user.readonly
+
+
+Events
+======
+
+UserLoggedIn
+------------
+
+The user has logged in by Google.
+
+Properties:
+
+- oauth
+
+  + access_token
+  + expires_in
+  + refresh_token
+
+- user_info
+
+  + Google user_info properties...
+
+UserLoggedOut
+-------------
+
+The user has logged out.
+
+
 Development
 ===========
 
@@ -116,3 +164,11 @@ Running tests::
    $ . venv/bin/activate
    (venv)$ pip install -r requirements-test.txt
    (venv)$ nosetests
+
+
+TODO
+====
+
+- Change authorization request for offline credentials (to get a refresh_token)
+- Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``
+- Add options for extending the OAuth2 scopes.
