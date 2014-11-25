@@ -111,7 +111,7 @@ General Usage
 
 When a user must be authenticated by Google, he must be sent to the
 ``auth_signin`` route url. The helper method
-``pyramid_google_login.redirect_to_signin`` redirect a user to the sign in
+``pyramid_google_login.redirect_to_signin`` redirect the user to the sign in
 page. This helper is handy to specify the next url and an optional message.
 
 .. code-block:: python
@@ -120,7 +120,13 @@ page. This helper is handy to specify the next url and an optional message.
    def unauthenticated(context, request):
        return redirect_to_signin(request, url=request.path_qs)
 
-Once authenticated, the user will be redirected to an url specified by:
+Once the user is authenticated, the ``UserLoggedIn`` pyramid event is
+broadcasted. The application can perform subsequent validations, create the
+user profile or update it.
+
+After that, the ``pyramid.security.remember`` helper is called.
+
+Then, the user will be redirected to an url specified by:
 
 - query parameter (signin page): ``url``
 - setting: ``security.google_login.landing_url``
