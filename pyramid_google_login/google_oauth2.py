@@ -4,6 +4,7 @@ import urlparse
 
 import requests
 from requests.exceptions import RequestException
+from pyramid.settings import aslist
 
 from pyramid_google_login import SETTINGS_PREFIX
 from pyramid_google_login import AuthFailed
@@ -27,6 +28,10 @@ def decode_state(state):
 def build_authorize_url(request, state):
     settings = request.registry.settings
     hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
+
+    scope_list = set(aslist(settings.get(SETTINGS_PREFIX + 'scopes', '')))
+    scope_list.add('email')
+
     try:
         client_id = settings[SETTINGS_PREFIX + 'client_id']
     except:
@@ -36,7 +41,7 @@ def build_authorize_url(request, state):
         "response_type": "code",
         "client_id": client_id,
         "redirect_uri": request.route_url("auth_callback"),
-        "scope": "email",
+        "scope": ','.join(scope_list),
         "state": state,
         "access_type": "offline",
     }

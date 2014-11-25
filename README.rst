@@ -170,4 +170,3 @@ TODO
 ====
 
 - Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``
-- Add options for extending the OAuth2 scopes.

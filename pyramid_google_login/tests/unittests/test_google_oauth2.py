@@ -34,14 +34,23 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
         request.registry.settings = {
             'security.google_login.client_id': 'CLIENTID',
             'security.google_login.hosted_domain': 'example.net',
+            'security.google_login.scopes': """
+                https://www.googleapis.com/auth/admin.directory.user.readonly
+                """,
         }
         state = 'TESTSTATE'
 
         url = build_authorize_url(request, state)
-        expected = ('https://accounts.google.com/o/oauth2/auth?'
-                    'access_type=offline&state=TESTSTATE&'
-                    'redirect_uri=TESTROUTEURL&response_type=code&'
-                    'client_id=CLIENTID&scope=email&hd=example.net')
+        expected = (
+            'https://accounts.google.com/o/oauth2/auth?'
+            'access_type=offline&'
+            'state=TESTSTATE&'
+            'redirect_uri=TESTROUTEURL&'
+            'response_type=code&'
+            'client_id=CLIENTID&'
+            'scope=email%2Chttps%3A%2F%2Fwww.googleapis.com%2F'
+            'auth%2Fadmin.directory.user.readonly&'
+            'hd=example.net')
 
         self.assertEqual(url, expected)
 
