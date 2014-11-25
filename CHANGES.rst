@@ -8,6 +8,7 @@ Development
 * Change authorization request for offline credentials (to get a refresh_token)
 * Add options to specify the OAuth2 scopes
 * Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``
+* Removed setting ``max_age`` (should be set in AuthTktAuthenticationPolicy)
 
 0.5.0 (2014-11-06)
 ------------------

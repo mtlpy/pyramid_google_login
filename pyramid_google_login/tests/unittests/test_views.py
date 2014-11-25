@@ -60,8 +60,7 @@ class TestCallback(unittest.TestCase):
         m_get_u.assert_called_once_with(m_exch_t.return_value)
         m_get_uid.assert_called_once_with(self.request, m_get_u.return_value)
         m_rem.assert_called_once_with(self.request,
-                                      principal=m_get_uid.return_value,
-                                      max_age=24 * 3600)
+                                      principal=m_get_uid.return_value)
 
         self.assertIsInstance(resp, HTTPFound)
         self.assertEqual(resp.location, '/next/url')

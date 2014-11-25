@@ -78,9 +78,6 @@ Optional settings:
    security.google_login.landing_route = my_frontend_route
    security.google_login.landing_route = mymodule:static/
 
-   # Cookie lifetime (passed as remember() parameter)
-   security.google_login.max_age = 86400
-
    # Add a banner on the sign in page
    security.google_login.signin_banner = Welcome on Project Euler
 

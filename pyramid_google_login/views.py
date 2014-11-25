@@ -87,9 +87,6 @@ def signin_redirect(request):
 @view_config(route_name='auth_callback',
              permission=NO_PERMISSION_REQUIRED)
 def callback(request):
-    settings = request.registry.settings
-    max_age = int(settings.get(SETTINGS_PREFIX + 'max_age', 24 * 3600))
-
     try:
         oauth2_token = exchange_token_from_code(request)
         userinfo = get_userinfo_from_token(oauth2_token)
@@ -115,7 +112,7 @@ def callback(request):
     event = UserLoggedIn(userid, oauth2_token, userinfo)
     request.registry.notify(event)
 
-    headers = remember(request, principal=userid, max_age=max_age)
+    headers = remember(request, principal=userid)
     return HTTPFound(location=url, headers=headers)
 
 
