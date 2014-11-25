@@ -235,30 +235,30 @@ class TestCheckHostedDomainUser(unittest.TestCase):
 class TestGetPrincipalFromUserinfo(unittest.TestCase):
     def test_nominal(self):
         from pyramid_google_login.google_oauth2 import (
-            get_principal_from_userinfo)
+            get_user_id_from_userinfo)
 
         userinfo = {'email': 'TESTEMAIL', 'id': 'TESTID'}
 
         request = mock.Mock()
 
         request.registry.settings = {}
-        principal = get_principal_from_userinfo(request, userinfo)
+        principal = get_user_id_from_userinfo(request, userinfo)
         self.assertEqual(principal, 'TESTEMAIL')
 
         request.registry.settings = {
             'security.google_login.user_id_field': 'email'}
-        principal = get_principal_from_userinfo(request, userinfo)
+        principal = get_user_id_from_userinfo(request, userinfo)
         self.assertEqual(principal, 'TESTEMAIL')
 
         request.registry.settings = {
             'security.google_login.user_id_field': 'id'}
-        principal = get_principal_from_userinfo(request, userinfo)
+        principal = get_user_id_from_userinfo(request, userinfo)
         self.assertEqual(principal, 'TESTID')
 
     def test_missing_field(self):
         from pyramid_google_login import AuthFailed
         from pyramid_google_login.google_oauth2 import (
-            get_principal_from_userinfo)
+            get_user_id_from_userinfo)
 
         userinfo = {}
 
@@ -266,7 +266,7 @@ class TestGetPrincipalFromUserinfo(unittest.TestCase):
         request.registry.settings = {}
 
         with self.assertRaises(AuthFailed) as test_exc:
-            get_principal_from_userinfo(request, userinfo)
+            get_user_id_from_userinfo(request, userinfo)
 
         self.assertEqual(test_exc.exception.message,
-                         'Missing principal field from Google userinfo')
+                         'Missing user id field from Google userinfo')

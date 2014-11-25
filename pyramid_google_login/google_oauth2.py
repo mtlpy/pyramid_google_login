@@ -125,14 +125,14 @@ def check_hosted_domain_user(request, userinfo):
                                                   hosted_domain))
 
 
-def get_principal_from_userinfo(request, userinfo):
+def get_user_id_from_userinfo(request, userinfo):
     user_id_field = request.registry.settings.get(
         SETTINGS_PREFIX + 'user_id_field',
         'email')
 
     try:
-        principal = userinfo[user_id_field]
+        user_id = userinfo[user_id_field]
     except:
-        raise AuthFailed("Missing principal field from Google userinfo")
+        raise AuthFailed("Missing user id field from Google userinfo")
 
-    return principal
+    return user_id

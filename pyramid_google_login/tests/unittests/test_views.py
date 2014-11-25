@@ -28,7 +28,7 @@ class TestIncludeme(unittest.TestCase):
 
 @mock.patch('pyramid_google_login.views.exchange_token_from_code')
 @mock.patch('pyramid_google_login.views.get_userinfo_from_token')
-@mock.patch('pyramid_google_login.views.get_principal_from_userinfo')
+@mock.patch('pyramid_google_login.views.get_user_id_from_userinfo')
 @mock.patch('pyramid_google_login.views.decode_state')
 @mock.patch('pyramid_google_login.views.remember')
 class TestCallback(unittest.TestCase):

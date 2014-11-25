@@ -12,7 +12,7 @@ from pyramid_google_login.google_oauth2 import (build_authorize_url,
                                                 exchange_token_from_code,
                                                 get_userinfo_from_token,
                                                 check_hosted_domain_user,
-                                                get_principal_from_userinfo,
+                                                get_user_id_from_userinfo,
                                                 encode_state,
                                                 decode_state,
                                                 )
@@ -93,7 +93,7 @@ def callback(request):
         oauth2_tokens = exchange_token_from_code(request)
         userinfo = get_userinfo_from_token(oauth2_tokens)
         check_hosted_domain_user(request, userinfo)
-        principal = get_principal_from_userinfo(request, userinfo)
+        principal = get_user_id_from_userinfo(request, userinfo)
 
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
