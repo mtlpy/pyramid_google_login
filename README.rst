@@ -139,7 +139,8 @@ The user has logged in by Google.
 
 Properties:
 
-- oauth
+- userid
+- oauth2_token
 
   + access_token
   + expires_in
@@ -154,6 +155,10 @@ UserLoggedOut
 
 The user has logged out.
 
+Properties:
+
+- userid
+
 
 Development
 ===========
@@ -164,9 +169,3 @@ Running tests::
    $ . venv/bin/activate
    (venv)$ pip install -r requirements-test.txt
    (venv)$ nosetests
-
-
-TODO
-====
-
-- Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``

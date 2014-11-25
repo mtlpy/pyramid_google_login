@@ -7,6 +7,7 @@ Development
 * Change internal API to get access to all OAuth2 tokens from view
 * Change authorization request for offline credentials (to get a refresh_token)
 * Add options to specify the OAuth2 scopes
+* Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``
 
 0.5.0 (2014-11-06)
 ------------------

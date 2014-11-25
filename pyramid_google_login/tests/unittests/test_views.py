@@ -47,7 +47,7 @@ class TestCallback(unittest.TestCase):
 
         self.request.route_url.return_value = '/test/url'
 
-    def test_nominal(self, m_rem, m_dec_s, m_get_p, m_get_u, m_exch_t):
+    def test_nominal(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
         from pyramid.httpexceptions import HTTPFound
 
@@ -58,9 +58,9 @@ class TestCallback(unittest.TestCase):
 
         m_exch_t.assert_called_once_with(self.request)
         m_get_u.assert_called_once_with(m_exch_t.return_value)
-        m_get_p.assert_called_once_with(self.request, m_get_u.return_value)
+        m_get_uid.assert_called_once_with(self.request, m_get_u.return_value)
         m_rem.assert_called_once_with(self.request,
-                                      principal=m_get_p.return_value,
+                                      principal=m_get_uid.return_value,
                                       max_age=24 * 3600)
 
         self.assertIsInstance(resp, HTTPFound)
@@ -69,7 +69,23 @@ class TestCallback(unittest.TestCase):
         expected_header = ('Set-Cookie', 'auth_tkt=plop')
         self.assertIn(expected_header, resp.headerlist)
 
-    def test_no_url(self, m_rem, m_dec_s, m_get_p, m_get_u, m_exch_t):
+    def test_event(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
+        from pyramid_google_login.views import callback
+        from pyramid_google_login.events import UserLoggedIn, Event
+
+        callback(self.request)
+
+        self.assertEqual(self.request.registry.notify.call_count, 1)
+        event = self.request.registry.notify.call_args[0][0]
+
+        self.assertIsInstance(event, UserLoggedIn)
+        self.assertIsInstance(event, Event)
+
+        self.assertEqual(event.userid, m_get_uid.return_value)
+        self.assertEqual(event.oauth2_token, m_exch_t.return_value)
+        self.assertEqual(event.userinfo, m_get_u.return_value)
+
+    def test_no_url(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
         from pyramid.httpexceptions import HTTPFound
 
@@ -81,7 +97,7 @@ class TestCallback(unittest.TestCase):
         self.assertIsInstance(resp, HTTPFound)
         self.assertEqual(resp.location, '/')
 
-    def test_oauth2_flow_error(self, m_rem, m_dec_s, m_get_p, m_get_u,
+    def test_oauth2_flow_error(self, m_rem, m_dec_s, m_get_uid, m_get_u,
                                m_exch_t):
         from pyramid_google_login.views import callback
         from pyramid_google_login import AuthFailed
@@ -101,7 +117,7 @@ class TestCallback(unittest.TestCase):
         self.assertEqual(test_exc.location,
                          '/test/url')
 
-    def test_unkown_error(self, m_rem, m_dec_s, m_get_p, m_get_u,
+    def test_unkown_error(self, m_rem, m_dec_s, m_get_uid, m_get_u,
                           m_exch_t):
         from pyramid_google_login.views import callback
 
@@ -122,7 +138,7 @@ class TestCallback(unittest.TestCase):
 
 
 @mock.patch('pyramid_google_login.views.find_landing_path')
-class Testsignin(unittest.TestCase):
+class TestSignin(unittest.TestCase):
 
     def setUp(self):
         self.request = mock.Mock()
@@ -173,3 +189,27 @@ class Testsignin(unittest.TestCase):
 
         self.assertIsInstance(resp, HTTPFound)
         self.assertEqual(resp.location, '/go/there')
+
+
+@mock.patch('pyramid_google_login.views.redirect_to_signin')
+class TestLogout(unittest.TestCase):
+
+    def setUp(self):
+        self.request = mock.Mock()
+        self.settings = {}
+        self.request.registry.settings = self.settings
+
+    def test_nominal(self, m_redirect):
+        from pyramid_google_login.views import logout
+        from pyramid_google_login.events import UserLoggedOut, Event
+
+        resp = logout(self.request)
+
+        self.assertEqual(resp, m_redirect.return_value)
+
+        self.assertEqual(self.request.registry.notify.called, True)
+        event = self.request.registry.notify.call_args[0][0]
+
+        self.assertIsInstance(event, UserLoggedOut)
+        self.assertIsInstance(event, Event)
+        self.assertEqual(event.userid, self.request.unauthenticated_userid)

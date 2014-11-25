@@ -8,6 +8,7 @@ from pyramid.httpexceptions import HTTPFound
 from pyramid_google_login import SETTINGS_PREFIX
 from pyramid_google_login import redirect_to_signin, find_landing_path
 from pyramid_google_login import AuthFailed
+from pyramid_google_login.events import UserLoggedIn, UserLoggedOut
 from pyramid_google_login.google_oauth2 import (build_authorize_url,
                                                 exchange_token_from_code,
                                                 get_userinfo_from_token,
@@ -90,10 +91,10 @@ def callback(request):
     max_age = int(settings.get(SETTINGS_PREFIX + 'max_age', 24 * 3600))
 
     try:
-        oauth2_tokens = exchange_token_from_code(request)
-        userinfo = get_userinfo_from_token(oauth2_tokens)
+        oauth2_token = exchange_token_from_code(request)
+        userinfo = get_userinfo_from_token(oauth2_token)
         check_hosted_domain_user(request, userinfo)
-        principal = get_user_id_from_userinfo(request, userinfo)
+        userid = get_user_id_from_userinfo(request, userinfo)
 
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
@@ -111,11 +112,19 @@ def callback(request):
     except:
         url = find_landing_path(request)
 
-    headers = remember(request, principal=principal, max_age=max_age)
+    event = UserLoggedIn(userid, oauth2_token, userinfo)
+    request.registry.notify(event)
+
+    headers = remember(request, principal=userid, max_age=max_age)
     return HTTPFound(location=url, headers=headers)
 
 
 @view_config(route_name='auth_logout')
 def logout(request):
+    userid = request.unauthenticated_userid
+    if userid is not None:
+        event = UserLoggedOut(userid)
+        request.registry.notify(event)
+
     headers = forget(request)
     return redirect_to_signin(request, "You are logged out!", headers=headers)
