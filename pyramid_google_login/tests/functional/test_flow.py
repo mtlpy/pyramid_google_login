@@ -48,9 +48,9 @@ class Test(unittest.TestCase):
 
         expected = (
             'https://accounts.google.com/o/oauth2/auth?'
-            'scope=email&state=url%3DTEST%252FURL&'
+            'access_type=offline&state=url%3DTEST%252FURL&'
             'redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Foauth2callback&'
-            'response_type=code&client_id=CLIENT_ID')
+            'response_type=code&client_id=CLIENT_ID&scope=email')
         self.assertEqual(resp.location, expected)
 
     def test_signin_redirect_missing_clientid(self):

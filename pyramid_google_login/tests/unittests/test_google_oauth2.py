@@ -39,9 +39,9 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
 
         url = build_authorize_url(request, state)
         expected = ('https://accounts.google.com/o/oauth2/auth?'
-                    'state=TESTSTATE&redirect_uri=TESTROUTEURL&'
-                    'response_type=code&client_id=CLIENTID&'
-                    'scope=email&hd=example.net')
+                    'access_type=offline&state=TESTSTATE&'
+                    'redirect_uri=TESTROUTEURL&response_type=code&'
+                    'client_id=CLIENTID&scope=email&hd=example.net')
 
         self.assertEqual(url, expected)
 

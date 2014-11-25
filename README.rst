@@ -112,8 +112,8 @@ Offline Usage
 =============
 
 If you want to call the Google APIs on behalf of the user, you must store the
-OAuth2 information provided in the UserLoggedIn event. The ``access_token`` is
-usable for a ``expires_in`` period. Then the ``refresh_token`` must be used to
+OAuth2 tokens provided in the UserLoggedIn event. The ``access_token`` is
+usable for an ``expires_in`` period. Then the ``refresh_token`` must be used to
 refresh the ``access_token``. This ``refresh_token`` is valide until the user
 revoke the application permissions.
 
@@ -169,6 +169,5 @@ Running tests::
 TODO
 ====
 
-- Change authorization request for offline credentials (to get a refresh_token)
 - Send Pyramid events ``UserLoggedIn`` and ``UserLoggedOut``
 - Add options for extending the OAuth2 scopes.

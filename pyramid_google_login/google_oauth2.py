@@ -38,6 +38,7 @@ def build_authorize_url(request, state):
         "redirect_uri": request.route_url("auth_callback"),
         "scope": "email",
         "state": state,
+        "access_type": "offline",
     }
 
     if hosted_domain is not None:
