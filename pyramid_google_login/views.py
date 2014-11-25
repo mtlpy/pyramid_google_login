@@ -109,8 +109,14 @@ def callback(request):
     except:
         url = find_landing_path(request)
 
-    event = UserLoggedIn(userid, oauth2_token, userinfo)
-    request.registry.notify(event)
+    try:
+        request.registry.notify(UserLoggedIn(userid, oauth2_token, userinfo))
+    except:
+        log.exception("Application crashed processing UserLoggedIn event"
+                      "\nuserinfo=%s oauth2_token=%s",
+                      userinfo, oauth2_token)
+        return redirect_to_signin(request,
+                                  "Google Login failed (application error)")
 
     headers = remember(request, principal=userid)
     return HTTPFound(location=url, headers=headers)

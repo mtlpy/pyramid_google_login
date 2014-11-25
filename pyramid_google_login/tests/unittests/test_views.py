@@ -84,6 +84,26 @@ class TestCallback(unittest.TestCase):
         self.assertEqual(event.oauth2_token, m_exch_t.return_value)
         self.assertEqual(event.userinfo, m_get_u.return_value)
 
+    def test_event_error(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
+        from pyramid_google_login.views import callback
+        from pyramid.httpexceptions import HTTPFound
+
+        class TestExc(Exception):
+            pass
+
+        self.request.registry.notify.side_effect = TestExc()
+
+        resp = callback(self.request)
+
+        self.assertIsInstance(resp, HTTPFound)
+
+        self.request.route_url.assert_called_once_with(
+            'auth_signin',
+            _query={'message': 'Google Login failed (application error)'})
+
+        self.assertEqual(resp.location,
+                         '/test/url')
+
     def test_no_url(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
         from pyramid.httpexceptions import HTTPFound
