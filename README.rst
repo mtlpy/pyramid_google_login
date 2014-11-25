@@ -49,18 +49,43 @@ Alternately you can use the ``pyramid.includes`` configuration value in your
    [app:myapp]
    pyramid.includes = pyramid_google_login
 
-Default settings::
+
+Setup: settings
+===============
+
+Mandatory settings:
+
+.. code-block:: ini
 
    security.google_login.client_id = xxxxxxx.apps.googleusercontent.com
    security.google_login.client_secret = xxxxxxxxxxxxxxxxxxxxxxxxx
-   # security.google_login.scopes = email
-   # security.google_login.user_id_field = email
-   # security.google_login.hosted_domain = example.net
-   # security.google_login.landing_url = /
-   # security.google_login.landing_route = my_frontend_route
-   # security.google_login.landing_route = mymodule:static/
-   # security.google_login.max_age = 86400
-   # security.google_login.signin_banner = Welcome on Project Euler
+
+Optional settings:
+
+.. code-block:: ini
+
+   # List of Google scopes (``email`` is automatically included)
+   security.google_login.scopes = email
+
+   # Field used to extract the userid (generally ``email`` or ``id``)
+   security.google_login.user_id_field = email
+
+   # Restrict authentication to a Google Apps domain
+   security.google_login.hosted_domain = example.net
+
+   # Redirect destination for logged in user.
+   security.google_login.landing_url = /
+   security.google_login.landing_route = my_frontend_route
+   security.google_login.landing_route = mymodule:static/
+
+   # Cookie lifetime (passed as remember() parameter)
+   security.google_login.max_age = 86400
+
+   # Add a banner on the sign in page
+   security.google_login.signin_banner = Welcome on Project Euler
+
+   # Add an advice on the sign in page
+   security.google_login.signin_advice = Ask Dilbert for access
 
 
 Setup: Google project
