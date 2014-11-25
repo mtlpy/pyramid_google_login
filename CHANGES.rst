@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* Change internal API to get access to all OAuth2 tokens from view
+
 0.5.0 (2014-11-06)
 ------------------
 

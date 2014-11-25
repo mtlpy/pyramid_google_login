@@ -85,11 +85,15 @@ class TestExchangeTokenFromCode(unittest.TestCase):
     def test_nominal(self, m_requests):
         from pyramid_google_login.google_oauth2 import exchange_token_from_code
 
-        token = exchange_token_from_code(self.request)
+        test_tokens = {
+            'access_token': 'POIPOI',
+            'refresh_token': 'REFRESH_POIPOI',
+        }
+        m_requests.post.return_value.json.return_value = test_tokens
 
-        m_json_response = m_requests.post.return_value.json.return_value
-        m_token = m_json_response.__getitem__.return_value
-        self.assertEqual(token, m_token)
+        oauth2_tokens = exchange_token_from_code(self.request)
+
+        self.assertEqual(oauth2_tokens, test_tokens)
 
     def test_param_error(self):
         self.request.params = {'error': 'TESTERROR'}
@@ -141,8 +145,13 @@ class TestGetUserinfoFromToken(unittest.TestCase):
         from pyramid_google_login import AuthFailed
         from pyramid_google_login.google_oauth2 import get_userinfo_from_token
 
+        test_tokens = {
+            'access_token': 'POIPOI',
+            'refresh_token': 'REFRESH_POIPOI',
+        }
+
         with self.assertRaises(AuthFailed) as test_exc:
-            get_userinfo_from_token('TESTTOKEN')
+            get_userinfo_from_token(test_tokens)
 
         self.assertEqual(test_exc.exception.message, message)
 
@@ -152,9 +161,12 @@ class TestGetUserinfoFromToken(unittest.TestCase):
 
         m_json_response = m_requests.get.return_value.json.return_value
 
-        access_token = 'TESTTOKEN'
+        test_tokens = {
+            'access_token': 'POIPOI',
+            'refresh_token': 'REFRESH_POIPOI',
+        }
 
-        userinfo = get_userinfo_from_token(access_token)
+        userinfo = get_userinfo_from_token(test_tokens)
 
         self.assertEqual(userinfo, m_json_response)
 

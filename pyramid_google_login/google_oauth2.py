@@ -75,7 +75,7 @@ def exchange_token_from_code(request):
     try:
         resp = requests.post(GOOGLE_TOKEN, data=params)
         resp.raise_for_status()
-        oauth2_response = resp.json()
+        oauth2_tokens = resp.json()
     except RequestException as err:
         raise AuthFailed("Failed to get token from Google (%s)" % err)
     except Exception as err:
@@ -83,18 +83,16 @@ def exchange_token_from_code(request):
                     exc_info=True)
         raise AuthFailed("Failed to get token from Google (unkown error)")
 
-    try:
-        access_token = oauth2_response['access_token']
-    except KeyError:
+    if 'access_token' not in oauth2_tokens:
         raise AuthFailed("No access_token in response from Google")
 
-    return access_token
+    return oauth2_tokens
 
 
-def get_userinfo_from_token(access_token):
+def get_userinfo_from_token(oauth2_tokens):
     try:
-        resp = requests.get(GOOGLE_USERINFO,
-                            params={'access_token': access_token})
+        params = {'access_token': oauth2_tokens['access_token']}
+        resp = requests.get(GOOGLE_USERINFO, params=params)
         resp.raise_for_status()
         return resp.json()
     except Exception:

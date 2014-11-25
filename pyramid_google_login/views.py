@@ -90,8 +90,8 @@ def callback(request):
     max_age = int(settings.get(SETTINGS_PREFIX + 'max_age', 24 * 3600))
 
     try:
-        access_token = exchange_token_from_code(request)
-        userinfo = get_userinfo_from_token(access_token)
+        oauth2_tokens = exchange_token_from_code(request)
+        userinfo = get_userinfo_from_token(oauth2_tokens)
         check_hosted_domain_user(request, userinfo)
         principal = get_principal_from_userinfo(request, userinfo)
 
