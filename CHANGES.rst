@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+1.0.0 (2014-11-26)
+------------------
 
 * Change internal API to get access to all OAuth2 tokens from view
 * Change authorization request for offline credentials (to get a refresh_token)
