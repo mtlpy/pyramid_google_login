@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+1.0.1 (2014-12-03)
+------------------
 
 * ``UserLoggedIn.headers`` permit subscribers to add headers to be returned in
   response and set customised auth cookie rather than default email.
