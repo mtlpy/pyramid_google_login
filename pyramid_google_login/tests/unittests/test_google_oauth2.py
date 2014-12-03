@@ -1,4 +1,5 @@
 import unittest
+import urlparse
 
 import mock
 
@@ -34,6 +35,7 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
         request.registry.settings = {
             'security.google_login.client_id': 'CLIENTID',
             'security.google_login.hosted_domain': 'example.net',
+            'security.google_login.access_type': 'offline',
             'security.google_login.scopes': """
                 https://www.googleapis.com/auth/admin.directory.user.readonly
                 """,
@@ -53,6 +55,45 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
             'hd=example.net')
 
         self.assertEqual(url, expected)
+
+    def run_build_authorize_url_with_settings(self, settings):
+        from pyramid_google_login.google_oauth2 import build_authorize_url
+
+        request = mock.Mock()
+        request.route_url.return_value = 'TESTROUTEURL'
+        request.registry.settings = {
+            'security.google_login.client_id': 'CLIENTID',
+        }
+        request.registry.settings.update(settings)
+
+        url = build_authorize_url(request, '')
+        return urlparse.parse_qs(urlparse.urlparse(url).query)
+
+    def test_setting_access_type(self):
+        settings = {}
+        qs = self.run_build_authorize_url_with_settings(settings)
+        self.assertIn('access_type', qs)
+        self.assertEqual(qs['access_type'], ['online'])
+
+        settings = {'security.google_login.access_type': 'online'}
+        qs = self.run_build_authorize_url_with_settings(settings)
+        self.assertIn('access_type', qs)
+        self.assertEqual(qs['access_type'], ['online'])
+
+        settings = {'security.google_login.access_type': 'offline'}
+        qs = self.run_build_authorize_url_with_settings(settings)
+        self.assertIn('access_type', qs)
+        self.assertEqual(qs['access_type'], ['offline'])
+
+    def test_setting_hosted_domain(self):
+        settings = {}
+        qs = self.run_build_authorize_url_with_settings(settings)
+        self.assertNotIn('hd', qs)
+
+        settings = {'security.google_login.hosted_domain': 'thing.example'}
+        qs = self.run_build_authorize_url_with_settings(settings)
+        self.assertIn('hd', qs)
+        self.assertEqual(qs['hd'], ['thing.example'])
 
     def test_missing_setting(self):
         from pyramid_google_login.google_oauth2 import build_authorize_url

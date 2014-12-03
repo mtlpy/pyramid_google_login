@@ -8,6 +8,7 @@ class Test(unittest.TestCase):
             settings = {
                 'security.google_login.client_id': 'CLIENT_ID',
                 'security.google_login.client_secret': 'CLIENT_SECRET',
+                'security.google_login.access_type': 'offline',
             }
 
         from pyramid.config import Configurator

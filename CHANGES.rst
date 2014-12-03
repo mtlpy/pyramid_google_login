@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* Add a setting for the access_type. Default to ``online``
+
 1.0.0 (2014-11-26)
 ------------------
 

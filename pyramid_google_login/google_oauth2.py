@@ -28,6 +28,7 @@ def decode_state(state):
 def build_authorize_url(request, state):
     settings = request.registry.settings
     hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
+    access_type = settings.get(SETTINGS_PREFIX + 'access_type', 'online')
 
     scope_list = set(aslist(settings.get(SETTINGS_PREFIX + 'scopes', '')))
     scope_list.add('email')
@@ -43,7 +44,7 @@ def build_authorize_url(request, state):
         "redirect_uri": request.route_url("auth_callback"),
         "scope": ','.join(scope_list),
         "state": state,
-        "access_type": "offline",
+        "access_type": access_type,
     }
 
     if hosted_domain is not None:
@@ -83,6 +84,12 @@ def exchange_token_from_code(request):
         resp.raise_for_status()
         oauth2_tokens = resp.json()
     except RequestException as err:
+        # try:
+        #     content, code = err.response.content, err.response.status_code
+        # except:
+        #     content, code = None, None
+        # log.warning("Error from Google Token endpoint (status %s):\n%s",
+        #             code, content, exc_info=True)
         raise AuthFailed("Failed to get token from Google (%s)" % err)
     except Exception as err:
         log.warning("Unkown error while calling token endpoint",

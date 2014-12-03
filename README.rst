@@ -67,6 +67,9 @@ Optional settings:
    # List of Google scopes (``email`` is automatically included)
    security.google_login.scopes = email
 
+   # Set the access type to ``offline`` to get a refresh_token (default: online)
+   security.google_login.access_type = online
+
    # Field used to extract the userid (generally ``email`` or ``id``)
    security.google_login.user_id_field = email
 

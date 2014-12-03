@@ -39,8 +39,6 @@ def includeme(config):
              renderer='pyramid_google_login:templates/signin.mako')
 def signin(request):
     settings = request.registry.settings
-    # auto_redirect = asbool(settings.get(SETTINGS_PREFIX + 'auto_redirect',
-    #                                     True))
     signin_banner = settings.get(SETTINGS_PREFIX + 'signin_banner')
     hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
     signin_advice = settings.get(SETTINGS_PREFIX + 'signin_advice')
