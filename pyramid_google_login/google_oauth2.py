@@ -84,12 +84,6 @@ def exchange_token_from_code(request):
         resp.raise_for_status()
         oauth2_tokens = resp.json()
     except RequestException as err:
-        # try:
-        #     content, code = err.response.content, err.response.status_code
-        # except:
-        #     content, code = None, None
-        # log.warning("Error from Google Token endpoint (status %s):\n%s",
-        #             code, content, exc_info=True)
         raise AuthFailed("Failed to get token from Google (%s)" % err)
     except Exception as err:
         log.warning("Unkown error while calling token endpoint",
