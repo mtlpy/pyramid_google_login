@@ -1,5 +1,6 @@
 import unittest
 
+from pyramid import testing
 import mock
 
 
@@ -34,7 +35,7 @@ class TestIncludeme(unittest.TestCase):
 class TestCallback(unittest.TestCase):
 
     def setUp(self):
-        self.request = mock.Mock()
+        self.request = testing.DummyRequest()
         self.request.params = {
             'code': 'CODE1234',
             'state': 'STATE1234'
@@ -43,9 +44,12 @@ class TestCallback(unittest.TestCase):
             'security.google_login.client_id': 'CLIENTID',
             'security.google_login.client_secret': 'CLIENTSECRET',
         }
-        self.request.registry.settings = self.settings
 
-        self.request.route_url.return_value = '/test/url'
+        testing.setUp(settings=self.settings)
+        #self.request.route_url.return_value = '/test/url'
+
+    def tearDown(self):
+        testing.tearDown()
 
     def test_nominal(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
@@ -70,15 +74,17 @@ class TestCallback(unittest.TestCase):
 
     def test_event(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
-        from pyramid_google_login.events import UserLoggedIn, Event
+        from pyramid_google_login.events import UserLoggedIn
 
-        callback(self.request)
+        subscriber = mock.Mock()
 
-        self.assertEqual(self.request.registry.notify.call_count, 1)
-        event = self.request.registry.notify.call_args[0][0]
+        with testing.testConfig() as config:
+            config.add_subscriber(subscriber, UserLoggedIn)
+            callback(self.request)
 
-        self.assertIsInstance(event, UserLoggedIn)
-        self.assertIsInstance(event, Event)
+        subscriber.assert_called_once_with(mock.ANY)
+
+        event = subscriber.call_args[0][0]
 
         self.assertEqual(event.userid, m_get_uid.return_value)
         self.assertEqual(event.oauth2_token, m_exch_t.return_value)
@@ -87,22 +93,23 @@ class TestCallback(unittest.TestCase):
     def test_event_error(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
         from pyramid.httpexceptions import HTTPFound
+        from pyramid_google_login.events import UserLoggedIn
 
-        class TestExc(Exception):
-            pass
+        subscriber = mock.Mock()
+        subscriber.side_effect = Exception()
 
-        self.request.registry.notify.side_effect = TestExc()
-
-        resp = callback(self.request)
+        with testing.testConfig() as config:
+            config.add_subscriber(subscriber, UserLoggedIn)
+            config.add_route('auth_signin', '/test/url')
+            resp = callback(self.request)
 
         self.assertIsInstance(resp, HTTPFound)
 
-        self.request.route_url.assert_called_once_with(
-            'auth_signin',
-            _query={'message': 'Google Login failed (application error)'})
-
-        self.assertEqual(resp.location,
-                         '/test/url')
+        self.assertEqual(
+            resp.location,
+            'http://example.com/test/url?message='
+            'Google+Login+failed+%28application+error%29',
+            )
 
     def test_no_url(self, m_rem, m_dec_s, m_get_uid, m_get_u, m_exch_t):
         from pyramid_google_login.views import callback
@@ -125,35 +132,53 @@ class TestCallback(unittest.TestCase):
 
         m_exch_t.side_effect = AuthFailed('TESTEXC')
 
-        test_exc = callback(self.request)
+        with testing.testConfig() as config:
+            config.add_route('auth_signin', '/test/url')
+            test_exc = callback(self.request)
 
         self.assertIsInstance(test_exc, HTTPFound)
 
-        self.request.route_url.assert_called_once_with(
-            'auth_signin',
-            _query={'message': 'Google Login failed (TESTEXC)'})
-
-        self.assertEqual(test_exc.location,
-                         '/test/url')
+        self.assertEqual(
+            test_exc.location,
+            'http://example.com/test/url?message='
+            'Google+Login+failed+%28TESTEXC%29',
+            )
 
     def test_unkown_error(self, m_rem, m_dec_s, m_get_uid, m_get_u,
                           m_exch_t):
-        from pyramid_google_login.views import callback
-
         from pyramid.httpexceptions import HTTPFound
+        from pyramid_google_login.views import callback
 
         m_exch_t.side_effect = Exception('TESTEXC')
 
-        test_exc = callback(self.request)
+        with testing.testConfig() as config:
+            config.add_route('auth_signin', '/test/url')
+            test_exc = callback(self.request)
 
         self.assertIsInstance(test_exc, HTTPFound)
 
-        self.request.route_url.assert_called_once_with(
-            'auth_signin',
-            _query={'message': 'Google Login failed (unkown)'})
+        self.assertEqual(
+            test_exc.exception.location,
+            'http://example.com/test/url?message='
+            'Google+Login+failed+%28unkown%29',
+            )
 
-        self.assertEqual(test_exc.exception.location,
-                         '/test/url')
+    def test_custom_cookie(self, m_rem, m_dec_s, m_get_uid, m_get_u,
+                           m_exch_t):
+        from pyramid_google_login.views import callback
+        from pyramid_google_login.events import UserLoggedIn
+
+        m_dec_s.return_value = {'url': ['/next/url']}
+
+        def subscriber(event):
+            event.headers = [('Set-Cookie', 'user=bob')]
+
+        with testing.testConfig() as config:
+            config.add_subscriber(subscriber, UserLoggedIn)
+            response = callback(self.request)
+
+        self.assertIn('Set-Cookie', response.headers)
+        self.assertEqual('user=bob', response.headers.get('Set-Cookie'))
 
 
 @mock.patch('pyramid_google_login.views.find_landing_path')

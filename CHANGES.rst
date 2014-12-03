@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* ``UserLoggedIn.headers`` permit subscribers to add headers to be returned in
+  response and set customised auth cookie rather than default email.
 * Add a setting for the access_type. Default to ``online``
 
 1.0.0 (2014-11-26)
