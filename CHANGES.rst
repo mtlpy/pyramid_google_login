@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* Fix incorrect authorize url format for multiple scopes
+
 1.0.1 (2014-12-03)
 ------------------
 

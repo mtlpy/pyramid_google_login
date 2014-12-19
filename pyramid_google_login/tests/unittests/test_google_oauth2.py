@@ -50,7 +50,7 @@ class TestBuildAuthorizeUrl(unittest.TestCase):
             'redirect_uri=TESTROUTEURL&'
             'response_type=code&'
             'client_id=CLIENTID&'
-            'scope=email%2Chttps%3A%2F%2Fwww.googleapis.com%2F'
+            'scope=email+https%3A%2F%2Fwww.googleapis.com%2F'
             'auth%2Fadmin.directory.user.readonly&'
             'hd=example.net')
 

@@ -42,7 +42,7 @@ def build_authorize_url(request, state):
         "response_type": "code",
         "client_id": client_id,
         "redirect_uri": request.route_url("auth_callback"),
-        "scope": ','.join(scope_list),
+        "scope": ' '.join(scope_list),
         "state": state,
         "access_type": access_type,
     }
