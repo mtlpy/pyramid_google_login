@@ -16,6 +16,8 @@ ApiSettings = namedtuple(
         access_type
         hosted_domain
         id
+        landing_route
+        landing_url
         scope_list
         secret
         signin_advice
@@ -163,14 +165,16 @@ def includeme(config):
 
     try:
         api_settings = ApiSettings(
-            id=settings[prefix + 'client_id'],
-            secret=settings[prefix + 'client_secret'],
-            hosted_domain=settings.get(prefix + 'hosted_domain'),
             access_type=settings.get(prefix + 'access_type', 'online'),
+            hosted_domain=settings.get(prefix + 'hosted_domain'),
+            id=settings[prefix + 'client_id'],
+            landing_route=settings.get(prefix + 'landing_route'),
+            landing_url=settings.get(prefix + 'landing_url'),
             scope_list=scope_list,
-            user_id_field=settings.get(prefix + 'user_id_field'),
-            signin_banner=settings.get(prefix + 'signin_banner'),
+            secret=settings[prefix + 'client_secret'],
             signin_advice=settings.get(prefix + 'signin_advice'),
+            signin_banner=settings.get(prefix + 'signin_banner'),
+            user_id_field=settings.get(prefix + 'user_id_field'),
             )
     except KeyError:
         log.error('Missing configuration settings')
