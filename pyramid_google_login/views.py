@@ -1,22 +1,14 @@
 import logging
+import urllib
+import urlparse
 
 from pyramid.view import view_config
-# from pyramid.settings import asbool
 from pyramid.security import (remember, forget, NO_PERMISSION_REQUIRED)
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid_google_login import SETTINGS_PREFIX
-from pyramid_google_login import redirect_to_signin, find_landing_path
-from pyramid_google_login import AuthFailed
+from pyramid_google_login import (redirect_to_signin, find_landing_path,
+                                  AuthFailed)
 from pyramid_google_login.events import UserLoggedIn, UserLoggedOut
-from pyramid_google_login.google_oauth2 import (build_authorize_url,
-                                                exchange_token_from_code,
-                                                get_userinfo_from_token,
-                                                check_hosted_domain_user,
-                                                get_user_id_from_userinfo,
-                                                encode_state,
-                                                decode_state,
-                                                )
 
 log = logging.getLogger(__name__)
 
@@ -34,14 +26,19 @@ def includeme(config):
     config.scan(__name__)
 
 
+def encode_state(params):
+    return urllib.urlencode(params)
+
+
+def decode_state(state):
+    return urlparse.parse_qs(state)
+
+
 @view_config(route_name='auth_signin',
              permission=NO_PERMISSION_REQUIRED,
              renderer='pyramid_google_login:templates/signin.mako')
 def signin(request):
-    settings = request.registry.settings
-    signin_banner = settings.get(SETTINGS_PREFIX + 'signin_banner')
-    hosted_domain = settings.get(SETTINGS_PREFIX + 'hosted_domain')
-    signin_advice = settings.get(SETTINGS_PREFIX + 'signin_advice')
+    googleapi_settings = request.googleapi_settings
     message = request.params.get('message')
     url = request.params.get('url')
 
@@ -59,9 +56,9 @@ def signin(request):
 
     return {'signin_redirect_url': redirect_url,
             'message': message,
-            'signin_banner': signin_banner,
-            'signin_advice': signin_advice,
-            'hosted_domain': hosted_domain,
+            'signin_banner': googleapi_settings.signin_banner,
+            'signin_advice': googleapi_settings.signin_advice,
+            'hosted_domain': googleapi_settings.hosted_domain,
             }
 
 
@@ -74,7 +71,7 @@ def signin_redirect(request):
 
     state = encode_state(state_params)
     try:
-        redirect_uri = build_authorize_url(request, state)
+        redirect_uri = request.googleapi.build_authorize_url(state)
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
         return redirect_to_signin(request, "Google Login failed (%s)" % err)
@@ -85,11 +82,13 @@ def signin_redirect(request):
 @view_config(route_name='auth_callback',
              permission=NO_PERMISSION_REQUIRED)
 def callback(request):
+    api = request.googleapi
+    redirect_uri = request.route_url('auth_callback')
     try:
-        oauth2_token = exchange_token_from_code(request)
-        userinfo = get_userinfo_from_token(oauth2_token)
-        check_hosted_domain_user(request, userinfo)
-        userid = get_user_id_from_userinfo(request, userinfo)
+        oauth2_token = api.exchange_token_from_code(redirect_uri)
+        userinfo = api.get_userinfo_from_token(oauth2_token)
+        api.check_hosted_domain_user(userinfo)
+        userid = api.get_user_id_from_userinfo(userinfo)
 
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)

@@ -17,6 +17,7 @@ def includeme(config):
     log.info("Add pyramid_google_login")
 
     config.include('pyramid_mako')
+    config.include('.utility')
     config.include('.views')
 
 
