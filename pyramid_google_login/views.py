@@ -65,18 +65,21 @@ def signin(request):
 @view_config(route_name='auth_signin_redirect',
              permission=NO_PERMISSION_REQUIRED,)
 def signin_redirect(request):
+    googleapi = request.googleapi
+    redirect_uri = request.route_url('auth_callback')
+
     state_params = {}
     if 'url' in request.params:
         state_params['url'] = request.params['url']
-
     state = encode_state(state_params)
+
     try:
-        redirect_uri = request.googleapi.build_authorize_url(state)
+        authorize_url = googleapi.build_authorize_url(state, redirect_uri)
     except AuthFailed as err:
         log.warning("Google Login failed (%s)", err)
         return redirect_to_signin(request, "Google Login failed (%s)" % err)
 
-    return HTTPFound(location=redirect_uri)
+    return HTTPFound(location=authorize_url)
 
 
 @view_config(route_name='auth_callback',

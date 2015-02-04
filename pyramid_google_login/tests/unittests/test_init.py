@@ -3,21 +3,6 @@ import unittest
 import mock
 
 
-class TestIncludeme(unittest.TestCase):
-
-    def test_includeme(self):
-        from pyramid_google_login import includeme
-
-        config = mock.Mock()
-
-        includeme(config)
-
-        config.include.assert_has_calls([
-            mock.call('pyramid_mako'),
-            mock.call('.views'),
-        ])
-
-
 class TestHelpers(unittest.TestCase):
 
     def test_redirect_to_signin(self):

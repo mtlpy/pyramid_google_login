@@ -8,6 +8,8 @@ import requests
 
 from pyramid_google_login import AuthFailed, SETTINGS_PREFIX
 
+from zope.interface import Interface
+
 log = logging.getLogger(__name__)
 
 ApiSettings = namedtuple(
@@ -25,6 +27,10 @@ ApiSettings = namedtuple(
         user_id_field
     """
     )
+
+
+class IApiClientFactory(Interface):
+    pass
 
 
 class ApiClient(object):
@@ -72,7 +78,7 @@ class ApiClient(object):
     def build_authorize_url(self, state, redirect_uri):
         params = {
             'response_type': 'code',
-            'client_id': self.client_id,
+            'client_id': self.id,
             'redirect_uri': redirect_uri,
             'scope': ' '.join(self.scope_list),
             'state': state,
@@ -150,7 +156,7 @@ class ApiClient(object):
     def get_user_id_from_userinfo(self, userinfo):
         try:
             user_id = userinfo[self.user_id_field]
-        except:
+        except KeyError:
             raise AuthFailed('Missing user id field from Google userinfo')
 
         return user_id
@@ -162,7 +168,6 @@ def includeme(config):
 
     scope_list = set(aslist(settings.get(prefix + 'scopes', '')))
     scope_list.add('email')
-
     try:
         api_settings = ApiSettings(
             access_type=settings.get(prefix + 'access_type', 'online'),
@@ -174,13 +179,19 @@ def includeme(config):
             secret=settings[prefix + 'client_secret'],
             signin_advice=settings.get(prefix + 'signin_advice'),
             signin_banner=settings.get(prefix + 'signin_banner'),
-            user_id_field=settings.get(prefix + 'user_id_field'),
+            user_id_field=settings.get(prefix + 'user_id_field', 'email'),
             )
-    except KeyError:
-        log.error('Missing configuration settings')
+    except KeyError as err:
+        log.error('Missing configuration setting: %s', err.message)
         raise
 
     config.add_request_method(lambda request: api_settings,
                               'googleapi_settings', property=True
                               )
-    config.add_request_method(ApiClient, 'googleapi', reify=True)
+
+    config.registry.registerUtility(ApiClient, provided=IApiClientFactory)
+    config.add_request_method(new_api_client, 'googleapi', reify=True)
+
+
+def new_api_client(request):
+    return request.registry.getUtility(IApiClientFactory)(request)
