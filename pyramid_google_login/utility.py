@@ -50,31 +50,6 @@ class ApiClient(object):
         self.scope_list = settings.scope_list
         self.user_id_field = settings.user_id_field
 
-    def refresh_access_token(self, refresh_token):
-        params = {
-            'client_id': self.id,
-            'client_secret': self.secret,
-            'refresh_token': refresh_token,
-            'grant_type': 'refresh_token',
-        }
-
-        try:
-            response = requests.get(self.token_endpoint, params=params)
-            response.raise_for_status()
-            oauth2_tokens = response.json()
-        except RequestException as err:
-            raise AuthFailed(err, 'Failed to get token from Google (%s)' % err)
-        except Exception as err:
-            log.warning('Unkown error while calling token endpoint',
-                        exc_info=True)
-            raise AuthFailed(err,
-                             'Failed to get token from Google (unknown error)')
-
-        if 'access_token' not in oauth2_tokens:
-            raise AuthFailed('No access_token in response from Google')
-
-        return oauth2_tokens
-
     def build_authorize_url(self, state, redirect_uri):
         params = {
             'response_type': 'code',
@@ -160,6 +135,31 @@ class ApiClient(object):
             raise AuthFailed('Missing user id field from Google userinfo')
 
         return user_id
+
+    def refresh_access_token(self, refresh_token):
+        params = {
+            'client_id': self.id,
+            'client_secret': self.secret,
+            'refresh_token': refresh_token,
+            'grant_type': 'refresh_token',
+        }
+
+        try:
+            response = requests.get(self.token_endpoint, params=params)
+            response.raise_for_status()
+            oauth2_tokens = response.json()
+        except RequestException as err:
+            raise AuthFailed(err, 'Failed to get token from Google (%s)' % err)
+        except Exception as err:
+            log.warning('Unkown error while calling token endpoint',
+                        exc_info=True)
+            raise AuthFailed(err,
+                             'Failed to get token from Google (unknown error)')
+
+        if 'access_token' not in oauth2_tokens:
+            raise AuthFailed('No access_token in response from Google')
+
+        return oauth2_tokens
 
 
 def includeme(config):
