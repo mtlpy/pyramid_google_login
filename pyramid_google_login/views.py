@@ -76,8 +76,8 @@ def signin_redirect(request):
     try:
         authorize_url = googleapi.build_authorize_url(state, redirect_uri)
     except AuthFailed as err:
-        log.warning("Google Login failed (%s)", err)
-        return redirect_to_signin(request, "Google Login failed (%s)" % err)
+        log.warning('Google Login failed (%s)', err)
+        return redirect_to_signin(request, 'Google Login failed (%s)' % err)
 
     return HTTPFound(location=authorize_url)
 
@@ -94,13 +94,13 @@ def callback(request):
         userid = api.get_user_id_from_userinfo(userinfo)
 
     except AuthFailed as err:
-        log.warning("Google Login failed (%s)", err)
-        return redirect_to_signin(request, "Google Login failed (%s)" % err)
+        log.warning('Google Login failed (%s)', err)
+        return redirect_to_signin(request, 'Google Login failed (%s)' % err)
 
     except Exception as err:
-        log.warning("Google Login failed (%s)", err)
+        log.warning('Google Login failed (%s)', err)
         # Protect against leaking critical information like client_secret
-        return redirect_to_signin(request, "Google Login failed (unkown)")
+        return redirect_to_signin(request, 'Google Login failed (unkown)')
 
     # Find the redirect url (fail-safe, the authentication is more important)
     try:
@@ -113,11 +113,11 @@ def callback(request):
     try:
         request.registry.notify(user_logged_in)
     except:
-        log.exception("Application crashed processing UserLoggedIn event"
-                      "\nuserinfo=%s oauth2_token=%s",
+        log.exception('Application crashed processing UserLoggedIn event'
+                      '\nuserinfo=%s oauth2_token=%s',
                       userinfo, oauth2_token)
         return redirect_to_signin(request,
-                                  "Google Login failed (application error)")
+                                  'Google Login failed (application error)')
 
     if user_logged_in.headers:
         headers = user_logged_in.headers
@@ -134,4 +134,4 @@ def logout(request):
         request.registry.notify(event)
 
     headers = forget(request)
-    return redirect_to_signin(request, "You are logged out!", headers=headers)
+    return redirect_to_signin(request, 'You are logged out!', headers=headers)
