@@ -15,3 +15,11 @@ class UserLoggedIn(Event):
 class UserLoggedOut(Event):
     def __init__(self, userid):
         self.userid = userid
+
+
+class AccessTokenExpired(Event):
+    def __init__(self, request, access_token, refresh_token):
+        self.request = request
+        self.access_token = access_token
+        self.refresh_token = refresh_token
+        self.new_token_info = None

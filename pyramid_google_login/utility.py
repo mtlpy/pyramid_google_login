@@ -7,6 +7,7 @@ from requests.exceptions import RequestException
 import requests
 
 from pyramid_google_login import AuthFailed, SETTINGS_PREFIX
+from pyramid_google_login.events import AccessTokenExpired
 
 from zope.interface import Interface
 
@@ -34,10 +35,12 @@ class IApiClientFactory(Interface):
 
 
 class ApiClient(object):
-
+    """-> https://developers.google.com/accounts/docs/OAuth2WebServer"""
     authorize_endpoint = 'https://accounts.google.com/o/oauth2/auth'
     token_endpoint = 'https://www.googleapis.com/oauth2/v3/token'
     userinfo_endpoint = 'https://www.googleapis.com/oauth2/v2/userinfo'
+    domain_users_endpoint = ('https://www.googleapis.com'
+                             '/admin/directory/v1/users')
 
     def __init__(self, request):
         self.request = request
@@ -145,7 +148,7 @@ class ApiClient(object):
         }
 
         try:
-            response = requests.get(self.token_endpoint, params=params)
+            response = requests.post(self.token_endpoint, params=params)
             response.raise_for_status()
             oauth2_tokens = response.json()
         except RequestException as err:
@@ -160,6 +163,17 @@ class ApiClient(object):
             raise AuthFailed('No access_token in response from Google')
 
         return oauth2_tokens
+
+    def get_domain_users(self, access_token, limit=500):
+        params = {
+            'maxResults': limit,
+            'domain': 'ludia.com',
+            'viewType': 'domain_public',
+            'access_token': access_token
+        }
+        response = requests.get(self.domain_users_endpoint, params=params)
+        response.raise_for_status()
+        return response
 
 
 def includeme(config):
@@ -191,7 +205,13 @@ def includeme(config):
 
     config.registry.registerUtility(ApiClient, provided=IApiClientFactory)
     config.add_request_method(new_api_client, 'googleapi', reify=True)
+    config.add_subscriber(refresh_token_subscriber, AccessTokenExpired)
 
 
 def new_api_client(request):
     return request.registry.getUtility(IApiClientFactory)(request)
+
+
+def refresh_token_subscriber(event):
+    api = event.request.googleapi
+    event.new_token_info = api.refresh_access_token(event.refresh_token)

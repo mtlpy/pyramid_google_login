@@ -8,6 +8,8 @@ Development
   It's created at configuration time to fail early when some info is missing.
 * Add ``request.googleapi`` created and reified for each request. It
   encapsulates google api functionalities.
+* Add event ``AccessTokenExpired`` to be notified by client to refresh
+  automatically access_token.
 
 1.0.2 (2014-12-19)
 ------------------

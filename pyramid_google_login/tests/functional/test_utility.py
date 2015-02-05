@@ -27,11 +27,11 @@ class TestUtility(Base):
         return ApiClient(self.get_request(path))
 
 
-@mock.patch('pyramid_google_login.utility.requests.get')
+@mock.patch('pyramid_google_login.utility.requests.post')
 class TestRefreshAccessToken(TestUtility):
 
-    def test_nominal(self, get):
-        response = get.return_value
+    def test_nominal(self, post):
+        response = post.return_value
         response.json.return_value = expected = {
             'access_token': 'i am a token',
         }
@@ -40,23 +40,23 @@ class TestRefreshAccessToken(TestUtility):
             self.googleapi.refresh_access_token('refresh token'),
             )
 
-    def test_raises_request_exception(self, get):
+    def test_raises_request_exception(self, post):
         from pyramid_google_login import AuthFailed
-        response = get.return_value
+        response = post.return_value
         response.raise_for_status.side_effect = RequestException('sh*t!')
         with self.assertRaises(AuthFailed):
             self.googleapi.refresh_access_token('refresh token')
 
-    def test_raises_any_exception(self, get):
+    def test_raises_any_exception(self, post):
         from pyramid_google_login import AuthFailed
-        response = get.return_value
+        response = post.return_value
         response.json.side_effect = ValueError('cr*p!')
         with self.assertRaises(AuthFailed):
             self.googleapi.refresh_access_token('refresh token')
 
-    def test_no_token_in_response(self, get):
+    def test_no_token_in_response(self, post):
         from pyramid_google_login import AuthFailed
-        response = get.return_value
+        response = post.return_value
         response.json.return_value = {
             'not_access_token': 'i am a NOT token',
         }
