@@ -1,4 +1,4 @@
-from . import Base
+from . import Base, ApiMockBase
 
 
 class Test(Base):
@@ -58,3 +58,51 @@ class Test(Base):
 
         expected = 'http://localhost/auth/signin?message=You+are+logged+out%21'
         self.assertEqual(resp.location, expected)
+
+
+class TestCallback(ApiMockBase):
+
+    def test_signin_redirect(self):
+        from pyramid_google_login import AuthFailed
+
+        self.googleapi.build_authorize_url.side_effect = AuthFailed('ooops')
+
+        response = self.app.get('/auth/signin_redirect', status=302)
+        self.assertIn(
+            'http://localhost/auth/signin?message=Google+Login+failed',
+            response.headers.get('Location')
+            )
+
+    def test_callback_nominal(self):
+        self.googleapi.get_user_id_from_userinfo.return_value = 'bob@bob.com'
+
+        response = self.app.get('/auth/oauth2callback', status=302)
+        self.assertEqual(
+            'http://localhost/',
+            response.headers.get('Location')
+            )
+
+    def test_callback_api_raises_exception(self):
+        self.googleapi.exchange_token_from_code.side_effect = Exception('wtf')
+
+        response = self.app.get('/auth/oauth2callback', status=302)
+        self.assertIn(
+            'http://localhost/auth/signin?',
+            response.headers.get('Location')
+            )
+        self.assertFalse(self.googleapi.get_userinfo_from_token.called)
+
+    def test_callback_with_failing_subscriber(self):
+        from pyramid_google_login.events import UserLoggedIn
+
+        def subscriber(event):
+            raise Exception('WTF')
+
+        self.config.add_subscriber(subscriber, UserLoggedIn)
+        self.googleapi.get_user_id_from_userinfo.return_value = 'bob@bob.com'
+
+        response = self.app.get('/auth/oauth2callback', status=302)
+        self.assertIn(
+            'http://localhost/auth/signin?',
+            response.headers.get('Location')
+            )

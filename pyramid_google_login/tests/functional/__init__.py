@@ -6,6 +6,8 @@ from pyramid.request import Request
 from pyramid.scripting import prepare
 from webtest import TestApp
 
+from pyramid_google_login.utility import IApiClientFactory
+
 
 class Base(unittest.TestCase):
 
@@ -34,3 +36,17 @@ class Base(unittest.TestCase):
         env = prepare(request=request, registry=self.config.registry)
         self.addCleanup(env['closer'])
         return request
+
+
+class ApiMockBase(Base):
+
+    @reify
+    def config(self):
+        _config = super(ApiMockBase, self).config
+        _config.commit()
+        _config.include('pyramid_google_login.tests')
+        return _config
+
+    @reify
+    def googleapi(self):
+        return self.config.registry.getUtility(IApiClientFactory)
