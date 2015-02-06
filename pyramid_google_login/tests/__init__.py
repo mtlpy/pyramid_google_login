@@ -4,7 +4,7 @@ from pyramid_google_login.utility import IApiClientFactory
 
 
 def includeme(config):
-    dummy_api_client = mock.Mock()
+    dummy_api_client = mock.MagicMock()
 
     config.registry.registerUtility(dummy_api_client,
                                     provided=IApiClientFactory)

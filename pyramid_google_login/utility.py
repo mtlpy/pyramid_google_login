@@ -7,7 +7,6 @@ from requests.exceptions import RequestException
 import requests
 
 from pyramid_google_login import AuthFailed, SETTINGS_PREFIX
-from pyramid_google_login.events import AccessTokenExpired
 
 from zope.interface import Interface
 
@@ -205,13 +204,7 @@ def includeme(config):
 
     config.registry.registerUtility(ApiClient, provided=IApiClientFactory)
     config.add_request_method(new_api_client, 'googleapi', reify=True)
-    config.add_subscriber(refresh_token_subscriber, AccessTokenExpired)
 
 
 def new_api_client(request):
     return request.registry.getUtility(IApiClientFactory)(request)
-
-
-def refresh_token_subscriber(event):
-    api = event.request.googleapi
-    event.new_token_info = api.refresh_access_token(event.refresh_token)
