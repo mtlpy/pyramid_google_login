@@ -6,7 +6,8 @@ from pyramid.settings import aslist
 from requests.exceptions import RequestException
 import requests
 
-from pyramid_google_login import AuthFailed, SETTINGS_PREFIX
+from pyramid_google_login import SETTINGS_PREFIX
+from pyramid_google_login.exceptions import AuthFailed, ApiError
 
 from zope.interface import Interface
 
@@ -170,9 +171,12 @@ class ApiClient(object):
             'viewType': 'domain_public',
             'access_token': access_token
         }
-        response = requests.get(self.domain_users_endpoint, params=params)
-        response.raise_for_status()
-        return response
+        try:
+            response = requests.get(self.domain_users_endpoint, params=params)
+            response.raise_for_status()
+            return response.json()
+        except (ValueError, RequestException) as err:
+            raise ApiError(err, 'Failed to get domain users (%s)' % err)
 
 
 def includeme(config):

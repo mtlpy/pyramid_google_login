@@ -41,21 +41,21 @@ class TestRefreshAccessToken(TestUtility):
             )
 
     def test_raises_request_exception(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.raise_for_status.side_effect = RequestException('sh*t!')
         with self.assertRaises(AuthFailed):
             self.googleapi.refresh_access_token('refresh token')
 
     def test_raises_any_exception(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.json.side_effect = ValueError('cr*p!')
         with self.assertRaises(AuthFailed):
             self.googleapi.refresh_access_token('refresh token')
 
     def test_no_token_in_response(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.json.return_value = {
             'not_access_token': 'i am a NOT token',
@@ -91,13 +91,13 @@ class TestExchangeTokenFromCode(TestUtility):
         post.assert_called_once_with(endpoint, data=params)
 
     def test_error_in_params(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         googleapi = self.get_googleapi('/?error=f*ck')
         with self.assertRaises(AuthFailed):
             googleapi.exchange_token_from_code('http://redirect_uri.com')
 
     def test_raises_request_exception(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.raise_for_status.side_effect = RequestException('cheis')
 
@@ -108,7 +108,7 @@ class TestExchangeTokenFromCode(TestUtility):
         self.assertTrue(post.called)
 
     def test_raises_any_exception(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.raise_for_status.side_effect = Exception('cheis')
 
@@ -119,7 +119,7 @@ class TestExchangeTokenFromCode(TestUtility):
         self.assertTrue(post.called)
 
     def test_no_token_in_response(self, post):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         response = post.return_value
         response.json.return_value = {
             'not_access_token': 'i am a NOT token',
@@ -141,7 +141,7 @@ class TestUserinfoFromToken(TestUtility):
         self.assertEqual(response.json.return_value, res)
 
     def test_raises_exception(self, get):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         get.side_effect = Exception('M*RDE!')
         with self.assertRaises(AuthFailed):
             self.googleapi.get_userinfo_from_token({'access_token': 'TOKEN'})
@@ -157,12 +157,12 @@ class TestCheckHostedDomainUser(TestUtility):
         self.assertIsNone(self.googleapi.check_hosted_domain_user({}))
 
     def test_not_same_domain(self):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         with self.assertRaises(AuthFailed):
             self.googleapi.check_hosted_domain_user({'hd': 'not_bob.com'})
 
     def test_no_hd_in_userinfo(self):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         with self.assertRaises(AuthFailed):
             self.googleapi.check_hosted_domain_user({'not_hd': 'whatever'})
 
@@ -176,6 +176,6 @@ class TestGetUserIdFromUserinfo(TestUtility):
             )
 
     def test_key_error(self):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
         with self.assertRaises(AuthFailed):
             self.googleapi.get_user_id_from_userinfo({'nope': 'whatever'})

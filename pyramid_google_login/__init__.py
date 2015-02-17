@@ -9,10 +9,6 @@ log = logging.getLogger(__name__)
 SETTINGS_PREFIX = 'security.google_login.'
 
 
-class AuthFailed(Exception):
-    pass
-
-
 def includeme(config):
     log.info("Add pyramid_google_login")
 

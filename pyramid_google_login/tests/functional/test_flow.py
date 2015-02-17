@@ -63,7 +63,7 @@ class Test(Base):
 class TestCallback(ApiMockBase):
 
     def test_signin_redirect(self):
-        from pyramid_google_login import AuthFailed
+        from pyramid_google_login.exceptions import AuthFailed
 
         self.googleapi.build_authorize_url.side_effect = AuthFailed('ooops')
 

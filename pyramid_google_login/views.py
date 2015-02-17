@@ -6,9 +6,9 @@ from pyramid.view import view_config
 from pyramid.security import (remember, forget, NO_PERMISSION_REQUIRED)
 from pyramid.httpexceptions import HTTPFound
 
-from pyramid_google_login import (redirect_to_signin, find_landing_path,
-                                  AuthFailed)
+from pyramid_google_login import redirect_to_signin, find_landing_path
 from pyramid_google_login.events import UserLoggedIn, UserLoggedOut
+from pyramid_google_login.exceptions import AuthFailed
 
 log = logging.getLogger(__name__)
 

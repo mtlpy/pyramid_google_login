@@ -8,6 +8,7 @@ Development
   It's created at configuration time to fail early when some info is missing.
 * Add ``request.googleapi`` created and reified for each request. It
   encapsulates google api functionalities.
+* Move ``AuthFailed`` to ``pyramid_google_login.exceptions``
 * Add event ``AccessTokenExpired`` to be notified by client to refresh
   automatically access_token.
 
