@@ -38,7 +38,7 @@ def decode_state(state):
              permission=NO_PERMISSION_REQUIRED,
              renderer='pyramid_google_login:templates/signin.mako')
 def signin(request):
-    googleapi_settings = request.googleapi_settings
+    googleapi_settings = request.registry.settings['googleapi_settings']
     message = request.params.get('message')
     url = request.params.get('url')
 

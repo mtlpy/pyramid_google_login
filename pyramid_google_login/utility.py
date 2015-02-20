@@ -45,7 +45,7 @@ class ApiClient(object):
     def __init__(self, request):
         self.request = request
 
-        settings = self.request.googleapi_settings
+        settings = self.request.registry.settings['googleapi_settings']
         self.id = settings.id
         self.secret = settings.secret
         self.hosted_domain = settings.hosted_domain
@@ -202,9 +202,7 @@ def includeme(config):
         log.error('Missing configuration setting: %s', err.message)
         raise
 
-    config.add_request_method(lambda request: api_settings,
-                              'googleapi_settings', property=True
-                              )
+    config.add_settings(googleapi_settings=api_settings)
 
     config.registry.registerUtility(ApiClient, provided=IApiClientFactory)
     config.add_request_method(new_api_client, 'googleapi', reify=True)

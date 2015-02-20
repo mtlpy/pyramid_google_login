@@ -36,6 +36,7 @@ class TestSignin(unittest.TestCase):
         self.settings = {
             'security.google_login.client_id': 'CLIENTID',
             'security.google_login.client_secret': 'CLIENTSECRET',
+            'googleapi_settings': mock.Mock(),
         }
         self.request.registry.settings = self.settings
 
@@ -47,7 +48,9 @@ class TestSignin(unittest.TestCase):
 
         resp = signin(self.request)
 
-        googleapi_settings = self.request.googleapi_settings
+        googleapi_settings = (
+            self.request.registry.settings['googleapi_settings']
+            )
 
         expected = {'hosted_domain': googleapi_settings.hosted_domain,
                     'message': None,
