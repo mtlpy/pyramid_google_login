@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+1.0.3 (2015-02-20)
+------------------
 
 * Add ``request.googleapi_settings`` containing google api specific settings.
   It's created at configuration time to fail early when some info is missing.
