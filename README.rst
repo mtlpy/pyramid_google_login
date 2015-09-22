@@ -195,7 +195,11 @@ Development
 
 Running tests::
 
-   $ virtualenv venv
-   $ . venv/bin/activate
-   (venv)$ pip install -r requirements-test.txt
-   (venv)$ nosetests
+   $ pip install -r requirements-test.txt
+   $ nosetests
+
+Running pylama (linters)::
+
+   $ pip install pylama
+   ...
+   $ pylama
