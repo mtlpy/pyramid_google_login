@@ -2,7 +2,7 @@
 Pyramid Google Login
 ====================
 
-Google Login extension for Pyramid. Implement the OAuth2 Server-side flow.
+Pyramid authentication policy for Google login (OAuth2 server-side flow)
 
 This extension doesn't configure any authentication policy. You are responsible
 of setting the proper security configuration in your Pyramid application. When
@@ -11,14 +11,13 @@ authenticated by Google, this extension calls the method
 remember the user identity.
 
 * PyPI: https://pypi.python.org/pypi/pyramid_google_login
-* Bitbucket: https://bitbucket.org/Ludia/pyramid_google_login
-* Tests: |droneio|
-* Bugs: https://bitbucket.org/Ludia/pyramid_google_login/issues
+* Code: https://github.com/ludia/pyramid_google_login
+* Tests: |travis|
 
-.. |droneio| image::
-   https://drone.io/bitbucket.org/Ludia/pyramid_google_login/status.png
-   :target: https://drone.io/bitbucket.org/Ludia/pyramid_google_login
-   :alt: Tests on drone.io
+.. |travis| image::
+   https://travis-ci.org/ludia/pyramid_google_login.svg?branch=master
+   :target: https://travis-ci.org/ludia/pyramid_google_login
+   :alt: Tests on TravisCI
 
 
 Installation
