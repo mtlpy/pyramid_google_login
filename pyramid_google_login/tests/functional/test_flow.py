@@ -25,13 +25,18 @@ class Test(Base):
     def test_signin_redirect(self):
         resp = self.app.get('/auth/signin_redirect?url=TEST%2FURL',
                             status=302)
+        location = resp.location
 
-        expected = (
-            'https://accounts.google.com/o/oauth2/auth?'
-            'access_type=offline&state=url%3DTEST%252FURL&'
-            'redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Foauth2callback&'
-            'response_type=code&client_id=client+id&scope=email&hd=bob.com')
-        self.assertEqual(resp.location, expected)
+        location_base = 'https://accounts.google.com/o/oauth2/auth?'
+        self.assertTrue(location.startswith(location_base))
+        self.assertIn('access_type=offline', location)
+        self.assertIn('state=url%3DTEST%252FURL', location)
+        redir = 'redirect_uri=http%3A%2F%2Flocalhost%2Fauth%2Foauth2callback'
+        self.assertIn(redir, location)
+        self.assertIn('response_type=code', location)
+        self.assertIn('client_id=client+id', location)
+        self.assertIn('scope=email', location)
+        self.assertIn('hd=bob.com', location)
 
     def test_callback_error(self):
         resp = self.app.get('/auth/oauth2callback',

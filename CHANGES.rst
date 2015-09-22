@@ -5,6 +5,7 @@ Development
 -----------
 
 * Switched over to github.com
+* Setup tests with tox and travis (but only for py27 and pypy)
 
 1.0.3 (2015-02-20)
 ------------------
