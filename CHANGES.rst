@@ -4,6 +4,8 @@ Changelog
 Development
 -----------
 
+* Let host app add a message when declining user login because of subsequent
+  validation done once the app receives the login event.
 * Switched over to github.com
 * Setup tests with tox and travis (but only for py27 and pypy)
 
