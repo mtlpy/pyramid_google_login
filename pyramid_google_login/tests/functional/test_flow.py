@@ -111,3 +111,19 @@ class TestCallback(ApiMockBase):
             'http://localhost/auth/signin?',
             response.headers.get('Location')
             )
+
+    def test_callback_with_subscriber_failing_auth(self):
+        from pyramid_google_login.events import UserLoggedIn
+        from pyramid_google_login.exceptions import AuthFailed
+
+        def subscriber(event):
+            raise AuthFailed('WTF')
+
+        self.config.add_subscriber(subscriber, UserLoggedIn)
+        self.googleapi.get_user_id_from_userinfo.return_value = 'bob@bob.com'
+
+        response = self.app.get('/auth/oauth2callback', status=302)
+        self.assertIn(
+            'http://localhost/auth/signin?message=WTF',
+            response.headers.get('Location')
+            )

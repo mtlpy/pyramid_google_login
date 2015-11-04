@@ -112,6 +112,8 @@ def callback(request):
     user_logged_in = UserLoggedIn(request, userid, oauth2_token, userinfo)
     try:
         request.registry.notify(user_logged_in)
+    except AuthFailed as e:
+        return redirect_to_signin(request, e.message)
     except:
         log.exception('Application crashed processing UserLoggedIn event'
                       '\nuserinfo=%s oauth2_token=%s',
