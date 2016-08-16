@@ -5,6 +5,7 @@ import urlparse
 from pyramid.view import view_config
 from pyramid.security import (remember, forget, NO_PERMISSION_REQUIRED)
 from pyramid.httpexceptions import HTTPFound
+from pyramid.security import authenticated_userid , unauthenticated_userid
 
 from pyramid_google_login import redirect_to_signin, find_landing_path
 from pyramid_google_login.events import UserLoggedIn, UserLoggedOut
@@ -42,7 +43,7 @@ def signin(request):
     message = request.params.get('message')
     url = request.params.get('url')
 
-    if request.authenticated_userid:
+    if authenticated_userid(request):
         if url:
             return HTTPFound(location=url)
         else:
@@ -128,7 +129,7 @@ def callback(request):
 
 @view_config(route_name='auth_logout')
 def logout(request):
-    userid = request.unauthenticated_userid
+    userid = unauthenticated_userid(request)
     if userid is not None:
         event = UserLoggedOut(userid)
         request.registry.notify(event)
