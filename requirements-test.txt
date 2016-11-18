@@ -1,8 +1,7 @@
-nose
-#nose-parameterized
-nosexcover
 coverage
 mock
+nose
+nosexcover
+pyramid
 webtest
 yanc==0.2.4
-pyramid
