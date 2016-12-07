@@ -2,6 +2,12 @@ import unittest
 
 import mock
 
+def mock_request():
+    request = mock.Mock()
+    request.route_url = mock.Mock()
+    request.route_url.return_value = '/'
+    return request
+
 
 class TestHelpers(unittest.TestCase):
 
@@ -9,7 +15,7 @@ class TestHelpers(unittest.TestCase):
         from pyramid.httpexceptions import HTTPFound
         from pyramid_google_login import redirect_to_signin
 
-        request = mock.Mock()
+        request = mock_request()
 
         httpfound = redirect_to_signin(request)
         self.assertIsInstance(httpfound, HTTPFound)
@@ -21,7 +27,7 @@ class TestHelpers(unittest.TestCase):
         from pyramid.httpexceptions import HTTPFound
         from pyramid_google_login import redirect_to_signin
 
-        request = mock.Mock()
+        request = mock_request()
 
         httpfound = redirect_to_signin(request, url='/test')
         self.assertIsInstance(httpfound, HTTPFound)
@@ -34,7 +40,7 @@ class TestHelpers(unittest.TestCase):
         from pyramid.httpexceptions import HTTPFound
         from pyramid_google_login import redirect_to_signin
 
-        request = mock.Mock()
+        request = mock_request()
 
         test_header = ('X-Test', 'Yeap')
 
@@ -47,7 +53,7 @@ class TestHelpers(unittest.TestCase):
     def test_find_landing_path(self):
         from pyramid_google_login import find_landing_path
 
-        request = mock.Mock()
+        request = mock_request()
         request.registry.settings = {
 
         }
@@ -59,7 +65,7 @@ class TestHelpers(unittest.TestCase):
     def test_find_landing_path_landing_url(self):
         from pyramid_google_login import find_landing_path
 
-        request = mock.Mock()
+        request = mock_request()
         request.registry.settings = {
             'security.google_login.landing_url': '/foobar',
         }
@@ -71,7 +77,7 @@ class TestHelpers(unittest.TestCase):
     def test_find_landing_path_landing_route(self):
         from pyramid_google_login import find_landing_path
 
-        request = mock.Mock()
+        request = mock_request()
         request.registry.settings = {
             'security.google_login.landing_route': 'myroute',
         }
@@ -83,7 +89,7 @@ class TestHelpers(unittest.TestCase):
     def test_find_landing_path_landing_route_static(self):
         from pyramid_google_login import find_landing_path
 
-        request = mock.Mock()
+        request = mock_request()
         request.registry.settings = {
             'security.google_login.landing_route': 'myroute',
         }
@@ -96,7 +102,7 @@ class TestHelpers(unittest.TestCase):
     def test_find_landing_path_fallback(self):
         from pyramid_google_login import find_landing_path
 
-        request = mock.Mock()
+        request = mock_request()
         request.registry.settings = {
             'security.google_login.landing_route': 'myroute',
         }

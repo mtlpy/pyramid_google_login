@@ -1,4 +1,11 @@
+import sys
 from . import Base, ApiMockBase
+
+def py3_str(obj):
+    if sys.version_info.major > 2:
+        return str(obj, 'utf-8')
+    return obj
+
 
 
 class Test(Base):
@@ -7,20 +14,20 @@ class Test(Base):
         resp = self.app.get('/auth/signin',
                             status=200)
         expected = '''href="http://localhost/auth/signin_redirect"'''
-        self.assertIn(expected, resp.body)
+        self.assertIn(expected, py3_str(resp.body))
 
     def test_signin_url(self):
         resp = self.app.get('/auth/signin?url=TESTURL',
                             status=200)
         expected = ('''href="http://localhost/auth/signin_redirect'''
                     '''?url=TESTURL"''')
-        self.assertIn(expected, resp.body)
+        self.assertIn(expected, py3_str(resp.body))
 
     def test_signin_message(self):
         resp = self.app.get('/auth/signin?message=TEST+MESSAGE',
                             status=200)
         expected = '''TEST MESSAGE'''
-        self.assertIn(expected, resp.body)
+        self.assertIn(expected, py3_str(resp.body))
 
     def test_signin_redirect(self):
         resp = self.app.get('/auth/signin_redirect?url=TEST%2FURL',

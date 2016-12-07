@@ -1,6 +1,10 @@
 from collections import namedtuple
 import logging
-import urllib
+import sys
+if sys.version_info.major > 2:
+    from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 
 from pyramid.settings import aslist
 from requests.exceptions import RequestException
@@ -66,8 +70,7 @@ class ApiClient(object):
         if self.hosted_domain is not None:
             params['hd'] = self.hosted_domain
 
-        authorize_url = '%s?%s' % (self.authorize_endpoint,
-                                   urllib.urlencode(params))
+        authorize_url = '%s?%s' % (self.authorize_endpoint, urlencode(params))
 
         return authorize_url
 
@@ -199,7 +202,7 @@ def includeme(config):
             user_id_field=settings.get(prefix + 'user_id_field', 'email'),
             )
     except KeyError as err:
-        log.error('Missing configuration setting: %s', err.message)
+        log.error('Missing configuration setting: %s', err)
         raise
 
     config.add_settings(googleapi_settings=api_settings)
