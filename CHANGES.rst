@@ -6,6 +6,7 @@ Development
 
 * Switched over to github.com
 * Setup tests with tox and travis (but only for py27 and pypy)
+* Support Python 3.5 (Thanks to ben@steady.supply)
 
 1.0.3 (2015-02-20)
 ------------------
