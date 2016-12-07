@@ -1,8 +1,8 @@
 Changelog
 =========
 
-Development
------------
+1.1.0 (2016-12-07)
+------------------
 
 * Switched over to github.com
 * Setup tests with tox and travis (but only for py27 and pypy)
