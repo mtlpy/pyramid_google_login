@@ -1,11 +1,6 @@
 import logging
-import sys
-if sys.version_info.major > 2:
-    from urllib.parse import parse_qs, urlencode
-else:
-    from urllib import urlencode
-    from urlparse import parse_qs
 
+from six.moves.urllib import parse
 from pyramid.view import view_config
 from pyramid.security import (remember, forget, NO_PERMISSION_REQUIRED)
 from pyramid.httpexceptions import HTTPFound
@@ -31,11 +26,11 @@ def includeme(config):
 
 
 def encode_state(params):
-    return urlencode(params)
+    return parse.urlencode(params)
 
 
 def decode_state(state):
-    return parse_qs(state)
+    return parse.parse_qs(state)
 
 
 @view_config(route_name='auth_signin',

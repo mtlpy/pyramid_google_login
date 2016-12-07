@@ -1,11 +1,11 @@
 import sys
 from . import Base, ApiMockBase
 
+
 def py3_str(obj):
     if sys.version_info.major > 2:
         return str(obj, 'utf-8')
     return obj
-
 
 
 class Test(Base):

@@ -1,11 +1,7 @@
 from collections import namedtuple
 import logging
-import sys
-if sys.version_info.major > 2:
-    from urllib.parse import urlencode
-else:
-    from urllib import urlencode
 
+from six.moves.urllib import parse
 from pyramid.settings import aslist
 from requests.exceptions import RequestException
 import requests
@@ -70,7 +66,10 @@ class ApiClient(object):
         if self.hosted_domain is not None:
             params['hd'] = self.hosted_domain
 
-        authorize_url = '%s?%s' % (self.authorize_endpoint, urlencode(params))
+        authorize_url = '%s?%s' % (
+            self.authorize_endpoint,
+            parse.urlencode(params)
+        )
 
         return authorize_url
 

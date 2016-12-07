@@ -2,6 +2,7 @@ import unittest
 
 import mock
 
+
 def mock_request():
     request = mock.Mock()
     request.route_url = mock.Mock()
