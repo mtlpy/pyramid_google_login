@@ -156,6 +156,10 @@ class TestCheckHostedDomainUser(TestUtility):
         self.googleapi.hosted_domain = None
         self.assertIsNone(self.googleapi.check_hosted_domain_user({}))
 
+    def test_empty_hosted_domain(self):
+        self.googleapi.hosted_domain = ''
+        self.assertIsNone(self.googleapi.check_hosted_domain_user({}))
+
     def test_not_same_domain(self):
         from pyramid_google_login.exceptions import AuthFailed
         with self.assertRaises(AuthFailed):
