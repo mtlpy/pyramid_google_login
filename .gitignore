@@ -6,3 +6,4 @@ nosetests.xml
 *.egg-info/
 .tox
 dist/
+*.pyc
