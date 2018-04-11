@@ -2,6 +2,7 @@ coverage
 mock
 nose
 nosexcover
+pylama
 pyramid
 webtest
 yanc==0.2.4

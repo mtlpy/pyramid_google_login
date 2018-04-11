@@ -63,7 +63,7 @@ class ApiClient(object):
             'access_type': self.access_type,
         }
 
-        if self.hosted_domain is not None:
+        if self.hosted_domain:
             params['hd'] = self.hosted_domain
 
         authorize_url = '%s?%s' % (
@@ -120,7 +120,7 @@ class ApiClient(object):
             raise AuthFailed('Failed to get userinfo from Google')
 
     def check_hosted_domain_user(self, userinfo):
-        if self.hosted_domain is None:
+        if not self.hosted_domain:
             return
 
         try:

@@ -105,13 +105,13 @@ def callback(request):
     try:
         state_params = decode_state(request.params['state'])
         url = state_params['url'][0]
-    except:
+    except Exception:
         url = find_landing_path(request)
 
     user_logged_in = UserLoggedIn(request, userid, oauth2_token, userinfo)
     try:
         request.registry.notify(user_logged_in)
-    except:
+    except Exception:
         log.exception('Application crashed processing UserLoggedIn event'
                       '\nuserinfo=%s oauth2_token=%s',
                       userinfo, oauth2_token)
