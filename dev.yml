@@ -1,0 +1,16 @@
+up:
+  - python: 3.6.4
+  - pip:
+    - requirements-test.txt
+  - custom:
+      name: Install package in develop mode
+      met?: pip show $(python setup.py --name) > /dev/null
+      meet: pip install -e .
+
+commands:
+  test:
+    run: nosetests
+  lint:
+    run: pylama
+  ci:
+    run: tox && pylama

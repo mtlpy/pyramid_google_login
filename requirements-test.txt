@@ -4,5 +4,5 @@ nose
 nosexcover
 pylama
 pyramid
+tox
 webtest
-yanc==0.2.4
