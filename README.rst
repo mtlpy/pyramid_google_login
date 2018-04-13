@@ -193,13 +193,17 @@ Properties:
 Development
 ===========
 
+This project supports Dad (https://github.com/pior/dad).
+
 Running tests::
 
-   $ pip install -r requirements-test.txt
+   $ pip install -r requirements.txt
    $ nosetests
 
 Running pylama (linters)::
 
-   $ pip install pylama
-   ...
    $ pylama
+
+Create a new release::
+
+   $ dad release 1.0

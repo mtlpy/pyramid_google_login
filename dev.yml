@@ -1,7 +1,7 @@
 up:
   - python: 3.6.4
   - pip:
-    - requirements-test.txt
+    - requirements.txt
   - custom:
       name: Install package in develop mode
       met?: pip show $(python setup.py --name) > /dev/null
@@ -14,3 +14,5 @@ commands:
     run: pylama
   ci:
     run: tox && pylama
+  release:
+    run: pyreleaser --push --upload
