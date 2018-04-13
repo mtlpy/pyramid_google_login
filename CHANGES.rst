@@ -1,9 +1,11 @@
 Changelog
 =========
 
-Development
------------
+1.2.0 (2018-04-12)
+------------------
 
+* Allow empty value for hosted domain #7
+* Use setuptools rather than distutils2 for packaging #8
 
 1.1.0 (2016-12-07)
 ------------------
