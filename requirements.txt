@@ -4,5 +4,6 @@ nose
 nosexcover
 pylama
 pyramid
+pyreleaser
 tox
 webtest
