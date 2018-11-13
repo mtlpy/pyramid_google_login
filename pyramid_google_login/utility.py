@@ -79,7 +79,7 @@ class ApiClient(object):
                 'Error from Google (%s)' % self.request.params['error'])
         try:
             code = self.request.params['code']
-        except KeyError as err:
+        except KeyError:
             raise AuthFailed('No authorization code from Google')
 
         params = {
@@ -98,7 +98,7 @@ class ApiClient(object):
         except RequestException as err:
             raise AuthFailed('Failed to get token from Google (%s)' % err)
 
-        except Exception as err:
+        except Exception:
             log.warning('Unkown error while calling token endpoint',
                         exc_info=True)
             raise AuthFailed('Failed to get token from Google (unkown error)')
