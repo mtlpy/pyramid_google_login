@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 with open('README.rst') as fd:
     description = fd.read()
 
-VERSION = '1.2.0'  # maintained by release tool
+VERSION = '1.2.1'  # maintained by release tool
 
 setup(
     name='pyramid_google_login',
