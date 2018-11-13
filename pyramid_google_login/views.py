@@ -121,7 +121,7 @@ def callback(request):
     if user_logged_in.headers:
         headers = user_logged_in.headers
     else:
-        headers = remember(request, principal=userid)
+        headers = remember(request, userid)
     return HTTPFound(location=url, headers=headers)
 
 
